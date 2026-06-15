@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MMIC CRM Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{--bg:#0c0c0f;--s:#16161a;--s2:#1e1e24;--bd:#2a2a32;--t:#e8e6e3;--t2:#9e9ca0;--ac:#6c5ce7;--a2:#a29bfe;--g:#00b894;--y:#fdcb6e;--o:#e17055;--r:#d63031;--b:#0984e3;--tl:#00cec9;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--t);font-family:'Noto Sans KR','DM Sans',sans-serif;line-height:1.6;}
+.hd{padding:24px 40px 14px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.hd h1{font-family:'DM Sans';font-size:22px;font-weight:700;}.hd h1 em{color:var(--a2);font-style:normal;}
+.st{font-size:11px;color:var(--t2);margin-top:2px;}.st.ok{color:var(--g);}
+.btn{background:var(--ac);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Noto Sans KR';}
+.btn:hover{background:var(--a2);}
+.tabs{display:flex;padding:0 40px;border-bottom:1px solid var(--bd);background:var(--s);overflow-x:auto;}
+.tab{padding:11px 16px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;user-select:none;white-space:nowrap;}
+.tab:hover{color:var(--t);}.tab.active{color:var(--a2);border-bottom-color:var(--ac);}
+.ct{padding:20px 40px 50px;}.pg{display:none;}.pg.active{display:block;}
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px;margin-bottom:20px;}
+.kp{background:var(--s);border:1px solid var(--bd);border-radius:9px;padding:12px 16px;}
+.kl{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;}
+.kv{font-family:'DM Sans';font-size:20px;font-weight:700;margin-top:2px;}
+.ks{font-size:9px;color:var(--t2);margin-top:1px;}
+.st2{font-size:14px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.st2::before{content:'';width:3px;height:15px;background:var(--ac);border-radius:2px;}
+.cd{background:var(--s);border:1px solid var(--bd);border-radius:9px;padding:18px;margin-bottom:18px;}
+.sn{color:var(--t2);font-size:11px;margin-bottom:12px;}
+.fs{display:flex;align-items:center;margin-bottom:6px;gap:8px;}
+.fl{width:100px;text-align:right;font-size:11px;color:var(--t2);flex-shrink:0;}
+.ft{flex:1;height:28px;background:var(--s2);border-radius:5px;overflow:hidden;}
+.fb{height:100%;border-radius:5px;display:flex;align-items:center;padding:0 9px;font-size:10px;font-family:'DM Sans';font-weight:600;min-width:40px;}
+.fv{width:80px;font-family:'DM Sans';font-size:11px;text-align:right;flex-shrink:0;}
+.fa{text-align:center;color:var(--t2);font-size:9px;margin:1px 0 1px 100px;}
+.rw{overflow-x:auto;}
+.rt{border-collapse:separate;border-spacing:2px;font-size:11px;}
+.rt th{padding:6px 9px;font-weight:500;color:var(--t2);font-size:10px;white-space:nowrap;text-align:center;}
+.rt th:first-child{text-align:left;}
+.rt .cl{text-align:left;font-weight:600;color:var(--t);padding:5px 9px;white-space:nowrap;}
+.rt .sc{text-align:center;font-family:'DM Sans';color:var(--t2);padding:5px 6px;}
+.rc{width:60px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:4px;font-family:'DM Sans';font-weight:600;font-size:10px;cursor:pointer;transition:transform .15s;position:relative;}
+.rc:hover{transform:scale(1.08);box-shadow:0 0 0 2px var(--ac);}
+.rc .tp{display:none;position:absolute;bottom:110%;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:3px 6px;border-radius:3px;font-size:9px;white-space:nowrap;z-index:10;}
+.rc:hover .tp{display:block;}
+.br{display:flex;align-items:center;margin-bottom:5px;gap:8px;cursor:pointer;padding:2px 0;border-radius:5px;transition:background .15s;}
+.br:hover{background:var(--s2);}
+.br.noc{cursor:default;}.br.noc:hover{background:transparent;}
+.bl{width:100px;font-size:11px;color:var(--t2);text-align:right;flex-shrink:0;}
+.bt{flex:1;height:20px;background:var(--s2);border-radius:4px;overflow:hidden;}
+.bf{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:6px;font-size:9px;font-family:'DM Sans';font-weight:600;min-width:28px;}
+.bv{width:60px;font-family:'DM Sans';font-size:10px;text-align:right;flex-shrink:0;}
+.tw{overflow-x:auto;max-height:400px;overflow-y:auto;}
+.tb{border-collapse:collapse;width:100%;font-size:11px;}
+.tb th{background:var(--s2);padding:6px 9px;text-align:left;font-weight:500;color:var(--t2);font-size:10px;position:sticky;top:0;z-index:2;white-space:nowrap;}
+.tb td{padding:5px 9px;border-bottom:1px solid var(--bd);white-space:nowrap;}
+.tb tr:hover td{background:rgba(108,92,231,.06);}
+.mo{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
+.mo.on{display:flex;}
+.md{background:var(--s);border:1px solid var(--bd);border-radius:12px;padding:20px;max-width:700px;width:94%;max-height:80vh;display:flex;flex-direction:column;}
+.mh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.mh h3{font-size:13px;font-weight:600;}.mx{background:none;border:none;color:var(--t2);font-size:18px;cursor:pointer;padding:3px 7px;border-radius:5px;}
+.mi{font-size:10px;color:var(--t2);padding:7px 0;border-top:1px solid var(--bd);}
+.ml{overflow-y:auto;flex:1;}.ml table{width:100%;border-collapse:collapse;font-size:10px;}
+.ml th{text-align:left;padding:4px 7px;color:var(--t2);font-size:9px;border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--s);}
+.ml td{padding:4px 7px;border-bottom:1px solid var(--bd);}
+.seg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:18px;}
+.seg-card{background:var(--s);border:1px solid var(--bd);border-radius:10px;padding:16px;cursor:pointer;transition:border-color .2s;}
+.seg-card:hover{border-color:var(--ac);}
+.seg-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;}
+.seg-nm{font-weight:600;font-size:13px;}
+.seg-ct{font-family:'DM Sans';font-size:26px;font-weight:700;margin:4px 0 2px;}
+.seg-st{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);}
+.seg-sl{font-size:9px;color:var(--t2);}.seg-sv{font-family:'DM Sans';font-size:12px;font-weight:600;}
+.dbg{background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:10px;margin-bottom:12px;font-size:10px;font-family:monospace;color:var(--t2);white-space:pre-wrap;max-height:150px;overflow:auto;}
+.wk-row{display:flex;gap:6px;margin-bottom:8px;font-size:11px;}
+.wk-label{width:80px;color:var(--t2);text-align:right;flex-shrink:0;}
+.wk-val{font-family:'DM Sans';font-weight:600;}
+.wk-diff{font-size:10px;margin-left:4px;}
+.wk-up{color:var(--g);}.wk-dn{color:var(--r);}.wk-eq{color:var(--t2);}
+.ld{text-align:center;padding:50px;color:var(--t2);}
+.sp{width:32px;height:32px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 12px;}
+@keyframes sp{to{transform:rotate(360deg);}}
+@media(max-width:768px){.hd,.ct{padding-left:14px;padding-right:14px;}.tabs{padding:0 14px;}}
+</style>
+</head>
+<body>
+<div class="hd"><div><h1><em>MMIC</em> CRM Dashboard</h1><div class="st" id="st">로딩 중...</div></div><div><button class="btn" onclick="init()">🔄 새로고침</button></div></div>
+<div class="tabs">
+  <div class="tab active" data-p="ov">Overview</div>
+  <div class="tab" data-p="fn">퍼널</div>
+  <div class="tab" data-p="rt">리텐션</div>
+  <div class="tab" data-p="rf">RFM</div>
+  <div class="tab" data-p="ss">26SS RFM</div>
+  <div class="tab" data-p="ca">장바구니</div>
+  <div class="tab" data-p="rp">26SS 재구매 단골</div>
+  <div class="tab" data-p="cr">OKS 집중</div>
+  </div>
+<div class="ct">
+<div class="ld" id="ld"><div class="sp"></div>구글 시트에서 5개 탭 데이터를 불러오고 있어요...</div>
+<div id="db" style="display:none;">
+  <div class="pg active" id="pg-ov"><div class="kr" id="k1"></div><div class="st2">퍼널 요약</div><div class="cd" id="f1"></div><div class="st2">구매 횟수 분포</div><div class="cd" id="s1"></div><div class="st2" style="margin-top:16px">주간 추이</div><div class="cd" id="wk-ov"></div></div>
+  <div class="pg" id="pg-fn"><div class="st2">전체 고객 퍼널</div><p class="sn">활성 장바구니: 구매 완료 상품 제외</p><div class="cd" id="f2"></div><div class="st2" style="margin-top:16px">월별 주문</div><div class="cd" id="f3"></div></div>
+  <div class="pg" id="pg-rt"><div class="st2">리텐션 코호트</div><p class="sn">첫 구매 월 코호트. 셀 클릭 → 고객.</p><div class="cd"><div class="rw" id="rh"></div></div><div class="st2" style="margin-top:16px">주간 추이</div><div class="cd" id="wk-rt"></div></div>
+  <div class="pg" id="pg-rf"><div class="st2">RFM 세그먼트</div><p class="sn">R: 마지막 구매 경과일 | F: 주문 횟수(중간값 기준) | M: 결제금액(중간값 기준)</p><div class="kr" id="k-rf"></div><div class="seg-grid" id="rf-grid"></div><div class="st2" style="margin-top:16px">세그먼트별 매출</div><div class="cd" id="rf-rev"></div><div class="st2" style="margin-top:16px">주간 추이</div><div class="cd" id="wk-rf"></div></div>
+  <div class="pg" id="pg-ss">
+  <div class="st2">26SS RFM (M > F > R)</div>
+  <div style="display:flex;gap:8px;align-items:center;margin:8px 0">
+    <input id="ss-search" type="text" placeholder="고객 ID 또는 이름 검색" style="background:var(--c2);color:var(--t1);border:1px solid var(--bd);border-radius:6px;padding:6px 12px;font-size:12px;width:250px" onkeydown="if(event.key==='Enter')searchSS()">
+    <button onclick="searchSS()" style="background:var(--ac);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer">검색</button>
+    <span id="ss-search-result" style="font-size:11px;color:var(--t2)"></span>
+  </div>
+  <p class="sn">26SS: 2026.02.20 이후 구매 | M(실결제금액) > F(누적주문건수) > R(최종주문일) 우선순위</p>
+  <div class="kr" id="k-ss"></div>
+  <div class="seg-grid" id="ss-grid"></div>
+  <div class="st2" style="margin-top:16px">세그먼트별 매출</div>
+  <div class="cd" id="ss-rev"></div>
+  <div class="st2" style="margin-top:16px">CRM 발송 → 구매 소요일</div>
+  <p class="sn">LMS/데이터라이즈 발송 후 첫 구매까지 걸린 일수</p>
+  <div class="cd" id="ss-crm-time"></div>
+  <div class="st2" style="margin-top:16px">UTM 메모</div>
+  <div class="cd" id="utm-memo-ss"></div>
+  <div class="st2" style="margin-top:16px">주간 추이</div>
+  <div class="cd" id="wk-ss"></div>
+</div>
+<div class="pg" id="pg-ca"><div class="st2">장바구니 → 구매 전환</div><p class="sn">구매 완료 상품 제외한 활성 장바구니 기준</p><div class="kr" id="k3"></div><div class="cd" id="ca1"></div><div class="st2" style="margin-top:16px">주간 추이</div><div class="cd" id="wk-ca"></div></div>
+  <div class="pg" id="pg-rp">
+  <div class="st2">26SS 재구매 단골</div>
+  <p class="sn">26SS(2026.02.20) 이후 2회+ 구매 고객. 주문번호 기준, 30K 미만 제외.</p>
+  <div class="kr" id="k-rp"></div>
+  <div class="cd" id="rp-segs"></div>
+  <div class="st2" style="margin-top:16px">CRM 발송 → 재구매 소요일</div>
+  <p class="sn">CRM 발송 받은 재구매 고객의 구매 소요일</p>
+  <div class="cd" id="rp-crm-time"></div>
+  <div class="st2" style="margin-top:16px">쿠폰 사용 현황</div>
+  <div class="cd" id="rp-cpn"></div>
+  <div class="st2" style="margin-top:16px">인기 상품</div>
+  <div class="cd" id="rp-prod"></div>
+  <div class="st2" style="margin-top:16px">주문 시간대</div>
+  <div class="cd" id="rp-hour"></div>
+  <div class="st2" style="margin-top:16px">적립금 사용</div>
+  <div class="cd" id="rp-pts"></div>
+  <div class="st2" style="margin-top:16px">UTM 메모</div>
+  <div class="cd" id="utm-memo-rp"></div>
+  <div class="st2" style="margin-top:16px">주간 추이</div>
+  <div class="cd" id="wk-rp"></div>
+</div>
+<div class="pg" id="pg-cr">
+  <div class="kr" id="k2"></div>
+  <div class="st2">OKS 시그니처 구매 퍼널</div>
+  <p class="sn">CRM 포커싱 고객의 시그니처 아이템 구매 여부 추적</p>
+  <div class="cd" id="okt-funnel"></div>
+  <div class="st2" style="margin-top:16px">우선순위 타겟</div>
+  <p class="sn">바 클릭 → 고객 프로파일</p>
+  <div class="cd" id="cs"></div>
+  <div class="st2" style="margin-top:16px">OKS 고객 퍼널 현황</div>
+  <p class="sn">각 고객이 가입→방문→장바구니→구매 중 어디에 있는지</p>
+  <div class="cd" id="okt-flow"></div>
+  <div class="st2" style="margin-top:16px">신규 추가 고객</div>
+  <p class="sn">이전 새로고침 대비 새로 추가된 OKS 포커싱 고객</p>
+  <div class="cd" id="okt-new"></div>
+  <div class="st2" style="margin-top:16px">UTM 분석</div>
+  <p class="sn">최초 유입(profile.utm) vs 최근 유입(profile.lastUtm)</p>
+  <div class="cd"><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="utm-grid"></div></div>
+  <div class="st2" style="margin-top:16px">CRM 발송 → 전환 추적</div>
+  <p class="sn">LMS 발송 고객의 UTM 매칭 + 전환 현황</p>
+  <div class="cd" id="crm-send"></div>
+  <div class="st2" style="margin-top:16px">UTM 메모</div>
+  <div class="cd" id="utm-memo-cr"></div>
+  <div class="st2" style="margin-top:16px">주간 추이</div>
+  <div class="cd" id="wk-cr"></div>
+  <div class="st2" style="margin-top:16px">신규가입 주차별 구매 전환 + 쿠폰</div>
+  <p class="sn">전체 고객 데이터 회원가입일 기준</p>
+  <div class="cd" id="su1"></div>
+</div>
+  
+
+</div></div>
+<div class="mo" id="mo" onclick="if(event.target===this)cm()"><div class="md"><div class="mh"><h3 id="mt"></h3><button class="mx" onclick="cm()">✕</button></div><div class="mi" id="mi2"></div><div class="ml" id="ml2"></div></div></div>
+<script>
+const SID='1UPEWqUhXR8cAiVXmKRmu0v19CuKSfKdpUr_YTOyoqyc';
+const GID={crm:0,customers:463195080,orders:206102215,cart:1781705300,exclude:1932594928,lms:1610136160,sendlog:479527448,utm:2104928942,refund:1182565035,precancel:1315397520,cancel:1263993980,cardcancel:1781243648};
+const NS=12;
+let D={},_rl={};
+const fm=n=>n!=null?n.toLocaleString('ko-KR'):'-';
+const pc=(a,b)=>b>0?(a/b*100).toFixed(1)+'%':'0%';
+const fw=n=>{n=+n||0;if(n>=1e8)return'\u20a9'+(n/1e8).toFixed(1)+'\uc5b5';if(n>=1e4)return'\u20a9'+Math.round(n/1e4)+'\ub9cc';return'\u20a9'+fm(n);};
+const dd=s=>{if(!s)return'-';if(s instanceof Date)return s.getFullYear()+'-'+String(s.getMonth()+1).padStart(2,'0')+'-'+String(s.getDate()).padStart(2,'0');const str=String(s);const gm=str.match(/^Date\((\d+),(\d+),(\d+)/);if(gm)return gm[1]+'-'+String(+gm[2]+1).padStart(2,'0')+'-'+String(+gm[3]).padStart(2,'0');const m=str.match(/(\d{4}[-\/]\d{1,2}[-\/]\d{1,2})/);return m?m[1]:str.substring(0,10);};
+const med=arr=>{if(!arr.length)return 0;const s=[...arr].sort((a,b)=>a-b);const m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2;};
+const parseNum=v=>{if(v==null)return 0;if(typeof v==='number')return v;return+(String(v).replace(/[,\s]/g,''))||0;};
+function pd(s){if(!s)return null;if(s instanceof Date)return isNaN(s)?null:s;const str=String(s);try{const gm=str.match(/^Date\((\d+),(\d+),(\d+)(?:,(\d+))?(?:,(\d+))?(?:,(\d+))?\)$/);if(gm)return new Date(+gm[1],+gm[2],+gm[3],+(gm[4]||0),+(gm[5]||0),+(gm[6]||0));if(str.includes('\uc624\uc804')||str.includes('\uc624\ud6c4')){const c=str.replace(/\./g,'').trim().split(/\s+/);let y=+c[0],m=+c[1],d=+c[2],ap=c[3],tp=(c[4]||'0:0').split(':'),h=+tp[0],mi=+tp[1]||0;if(ap==='\uc624\ud6c4'&&h!==12)h+=12;if(ap==='\uc624\uc804'&&h===12)h=0;return new Date(y,m-1,d,h,mi);}const d=new Date(str);return isNaN(d)?null:d;}catch(e){return null;}}
+function fc(row){if(!row)return null;const ks=Object.keys(row);return function(...ns){for(const n of ns)if(ks.includes(n))return n;for(const n of ns){const f=ks.find(k=>k.includes(n));if(f)return f;}return null;};}
+function gviz(key,cb){const fn='__cb_'+key+'_'+Date.now();window[fn]=function(resp){delete window[fn];if(!resp||resp.status==='error'){cb([]);return;}const cols=resp.table.cols.map(c=>(c.label||'').trim()||c.id);const rows=resp.table.rows.map(r=>{const o={};r.c.forEach((cell,i)=>{if(i<cols.length)o[cols[i]]=cell?(cell.v!=null?cell.v:cell.f||null):null;});return o;});cb(rows);};const s=document.createElement('script');s.src='https://docs.google.com/spreadsheets/d/'+SID+'/gviz/tq?tqx=responseHandler:'+fn+'&gid='+GID[key];s.onerror=function(){delete window[fn];cb([]);};document.body.appendChild(s);}
+function getWk(d){const dt=d||new Date();const day=dt.getDay();const mon=new Date(dt);mon.setDate(dt.getDate()-(day===0?6:day-1));return mon.toISOString().substring(0,10);}
+
+function init(){D={};let done=0;
+try{const wd=JSON.parse(localStorage.getItem('mmic_weekly')||'{}');
+// Clean: merge same-week entries, remove non-Monday keys
+const cleaned2={};for(const[k,v]of Object.entries(wd)){const ck=k.replace('mmic_wk_','');const dt=new Date(ck);if(isNaN(dt))continue;const day=dt.getDay();const mon=new Date(dt);mon.setDate(dt.getDate()-(day===0?6:day-1));const mk=mon.toISOString().substring(0,10);if(!cleaned2[mk])cleaned2[mk]=v;else cleaned2[mk]={...cleaned2[mk],...v};}
+localStorage.setItem('mmic_weekly',JSON.stringify(cleaned2));}catch(e){}
+document.getElementById('ld').style.display='block';document.getElementById('db').style.display='none';
+document.getElementById('st').textContent='\ub85c\ub529 0/'+NS;document.getElementById('st').className='st';
+Object.keys(GID).forEach(k=>{gviz(k,rows=>{D[k]=rows;done++;
+document.getElementById('st').textContent='\ub85c\ub529 '+done+'/'+NS;
+if(done>=NS){document.getElementById('st').textContent='\u2713 \ub85c\ub4dc \uc644\ub8cc \xb7 '+new Date().toLocaleString('ko-KR');document.getElementById('st').className='st ok';document.getElementById('ld').style.display='none';document.getElementById('db').style.display='block';go();}});});}
+
+function go(){
+const crm=D.crm||[],cust=D.customers||[],orders=D.orders||[],cart=D.cart||[],excl=D.exclude||[];
+// EXCLUDE
+const exSet=new Set();
+if(excl.length>0){const ef=fc(excl[0]);
+['\uc544\uc774\ub514','id','ID','\uc8fc\ubb38\uc790ID','\uace0\uac1d \uc544\uc774\ub514'].forEach(col=>{const c2=ef?ef(col):null;if(c2)excl.forEach(r=>{if(r[c2])exSet.add(String(r[c2]).trim());});});
+if(exSet.size===0){const ks=Object.keys(excl[0]).slice(0,3);excl.forEach(r=>ks.forEach(k=>{if(r[k]&&typeof r[k]==='string')exSet.add(r[k].trim());}));}}
+console.log('Exclude:',exSet.size);
+// ORDER COLS
+const of0=fc(orders[0]);
+const oI=of0?of0('\uc8fc\ubb38\uc790ID'):null,oD=of0?of0('\uc8fc\ubb38\uc77c\uc2dc'):null,oN=of0?of0('\uc8fc\ubb38\ubc88\ud638'):null;
+const oNm=of0?of0('\uc8fc\ubb38\uc790\uba85'):null,oG=of0?of0('\uc8fc\ubb38 \uc2dc \ud68c\uc6d0\ub4f1\uae09'):null;
+const oAmt=of0?of0('\ucd1d \uacb0\uc81c\uae08\uc561'):null,oProd=of0?of0('\uc0c1\ud488\ucf54\ub4dc'):null;
+const oCpn=of0?of0('\uc0ac\uc6a9\ud55c \ucfe0\ud3f0\uba85'):null;
+const oProdNm=of0?of0('\uc8fc\ubb38\uc0c1\ud488\uba85','\uc8fc\ubb38 \uc0c1\ud488\uba85'):null;
+// FILTER
+let fo=orders;
+if(oG)fo=fo.filter(r=>String(r[oG])!=='LEVEL 999');
+if(oI)fo=fo.filter(r=>!exSet.has(String(r[oI]||'').trim()));
+if(oAmt)fo=fo.filter(r=>parseNum(r[oAmt])>=30000);
+console.log('Orders after filter:',fo.length,'from',orders.length);
+// CUST COLS
+const cf1=fc(cust[0]);const cuId=cf1?cf1('\uc544\uc774\ub514'):null;const cuDate=cf1?cf1('\ud68c\uc6d0 \uac00\uc785\uc77c'):null;
+const cuM=cf1?cf1('\uc2e4\uacb0\uc81c\uae08\uc561'):null;
+const cuLastOrder=cf1?cf1('\ucd5c\uc885\uc8fc\ubb38\uc77c'):null;
+const cuFreq=cf1?cf1('\ub204\uc801\uc8fc\ubb38\uac74\uc218'):null;
+const cuName=cf1?cf1('\uc774\ub984'):null;
+console.log('Cust cols:',cuId,cuM,cuLastOrder,cuFreq,cuName);
+let fCust=cust;if(cuId)fCust=cust.filter(r=>!exSet.has(String(r[cuId]||'').trim()));
+// BUYER MAP
+const bm={};
+fo.forEach(r=>{const id=oI?String(r[oI]||'').trim():null;if(!id)return;
+if(!bm[id])bm[id]={id,name:oNm?r[oNm]:'',orderNos:new Set(),orderDates:[],totalAmt:0,coupons:[],prodNames:[]};
+const no=oN?r[oN]:null;
+if(no&&!bm[id].orderNos.has(no)){bm[id].orderNos.add(no);
+const d=oD?pd(r[oD]):null;const amt=oAmt?parseNum(r[oAmt]):0;
+if(d)bm[id].orderDates.push({no,date:d,prod:oProd?r[oProd]:''});
+bm[id].totalAmt+=amt;bm[id].coupons.push(oCpn?r[oCpn]||null:null);
+const pnm=oProdNm?r[oProdNm]:null;if(pnm)bm[id].prodNames.push(pnm);}});
+window._allBuyerMap=bm;
+const buyers=Object.values(bm),nB=buyers.length,nR=buyers.filter(b=>b.orderNos.size>=2).length,nL=buyers.filter(b=>b.orderNos.size>=3).length;
+// ACTIVE CART
+const cf0=fc(cart[0]);const cId=cf0?cf0('\uace0\uac1d \uc544\uc774\ub514','\uace0\uac1d\uc544\uc774\ub514'):null;
+const cDate=cf0?cf0('\uc7a5\ubc14\uad6c\ub2c8 \ub2f4\uc740'):null;const cName=cf0?cf0('\uace0\uac1d\uba85'):null;
+const cProd=cf0?cf0('\uc0c1\ud488\ucf54\ub4dc'):null;const cProdNm=cf0?cf0('\uc0c1\ud488\uba85'):null;
+let activeCart=cart;
+if(cId&&cProd){activeCart=cart.filter(r=>{const id=String(r[cId]||'').trim();const prod=r[cProd];if(!id||exSet.has(id))return false;const buyer=bm[id];if(buyer&&prod){const cartD=cDate?pd(r[cDate]):null;if(buyer.orderDates.some(od=>od.prod===prod&&(!cartD||od.date>=cartD)))return false;}return true;});}
+const acSet=new Set();activeCart.forEach(r=>{if(cId)acSet.add(String(r[cId]||'').trim());});
+const nAC=acSet.size,nCu=fCust.length,nCr=crm.length;
+// OVERVIEW
+document.getElementById('k1').innerHTML=kp('\uc804\uccb4\uace0\uac1d',fm(nCu))+kp('\uad6c\ub9e4',fm(nB),'\uc9c1\uc6d0\uc81c\uc678','var(--g)')+kp('\uc7ac\uad6c\ub9e4 2+',fm(nR),pc(nR,nB),'var(--a2)')+kp('CRM',fm(nCr),'\ubbf8\uad6c\ub9e4','var(--o)')+kp('\uc81c\uc678',fm(exSet.size),'','var(--r)');
+// FUNNEL
+const loySet=new Set(),repSet=new Set();
+const loyList=buyers.filter(b=>b.orderNos.size>=3).map(b=>{loySet.add(b.id);return{id:b.id,name:b.name};});
+const repList=buyers.filter(b=>b.orderNos.size>=2&&!loySet.has(b.id)).map(b=>{repSet.add(b.id);return{id:b.id,name:b.name};});
+window._fnLists={'\uc7ac\uad6c\ub9e4(2+)':repList,'\ucda9\uc131(3+)':loyList};
+const fd=[{l:'\uc804\uccb4\uace0\uac1d',v:nCu,c:'var(--t2)'},{l:'\uad6c\ub9e4',v:nB,c:'var(--g)'},{l:'\uc7ac\uad6c\ub9e4(2+)',v:nR,c:'var(--a2)',k:'\uc7ac\uad6c\ub9e4(2+)'},{l:'\ucda9\uc131(3+)',v:nL,c:'var(--ac)',k:'\ucda9\uc131(3+)'}];
+mf('f1',fd);mf('f2',fd);
+let sh='';[{n:'1\ud68c',c:nB-nR,cl:'var(--o)'},{n:'2\ud68c',c:nR-nL,cl:'var(--b)'},{n:'3+',c:nL,cl:'var(--ac)'}].forEach(s=>sh+=mkbar(s.n,s.c,nB,s.cl));document.getElementById('s1').innerHTML=sh;
+// RETENTION
+try{buildRet(buyers);mkM(buyers);}catch(e){console.error('Ret:',e);}
+// RFM
+try{buildRFM(fCust,cuId,cuM,cuLastOrder,cuFreq,cuName,exSet);}catch(e){console.error('RFM:',e)}
+// 26SS RFM
+try{buildRFM26SS(fo,oI,oD,oN,oNm,oAmt,exSet,fCust,cuId,cuDate,D.refund||[],D.cardcancel||[]);}catch(e){console.error('26SS:',e);document.getElementById('ss-grid').innerHTML='<p style="color:var(--r)">'+e.message+'</p>';document.getElementById('rf-grid').innerHTML='<p style="color:var(--r)">RFM: '+e.message+'</p>';}
+// REPEAT
+try{buildRepeat(fo,oI,oD,oN,oNm,oAmt,oCpn,oProdNm,D.refund||[],D.cardcancel||[]);}catch(e){console.error('Repeat:',e);}
+// CART
+try{mkCart(activeCart,bm,cId,cDate,cName,cProd,cProdNm);}catch(e){console.error('Cart:',e);}
+// CRM
+try{const fCrm=crm.filter(r=>!exSet.has(String(r.memberId||'').trim()));mkCRM(fCrm);}catch(e){console.error('CRM:',e);}
+// SIGNUP
+try{mkSignup(fCust,bm,cuId,cuDate,oCpn,fo,oI,oN);}catch(e){console.error('Signup:',e);try{document.getElementById('su1').innerHTML='<p style="color:var(--r)">'+e.message+'</p>';}catch(e2){}}
+// OKS FUNNEL FLOW
+try{
+const oktCusts=crm;const custById={};fCust.forEach(r=>{const id=cuId?String(r[cuId]||'').trim():'';if(id)custById[id]=r;});
+const cartIds2=new Set();const cartIdCol2=fc(cart[0])?fc(cart[0])('\uace0\uac1d \uc544\uc774\ub514','\uace0\uac1d\uc544\uc774\ub514'):null;
+cart.forEach(r=>{if(cartIdCol2){const cid=String(r[cartIdCol2]||'').trim();if(cid)cartIds2.add(cid);}});
+const orderIds2=new Set();fo.forEach(r=>{if(oI){const oid=String(r[oI]||'').trim();if(oid)orderIds2.add(oid);}});
+const NOW2=new Date();let stC={signup:0,visit:0,cart:0,purchase:0};const custFlows=[];
+oktCusts.forEach(r=>{const mid=String(r.memberId||'').trim();const custData=custById[mid];
+const signupD=pd(r.createdAt);const daysSince=signupD?Math.floor((NOW2-signupD)/864e5):999;
+let visitDate='-';if(custData){const vCol=Object.keys(custData).find(k=>k.includes('\ucd5c\uc885\uc811\uc18d\uc77c'));if(vCol&&custData[vCol])visitDate=dd(custData[vCol]);}
+const hasCart=cartIds2.has(mid)||+(r['profile.cartCount']||0)>0;
+const hasPurchase=orderIds2.has(mid);
+let stage;if(hasPurchase){stage='\uad6c\ub9e4';stC.purchase++;}else if(hasCart){stage='\uc7a5\ubc14\uad6c\ub2c8';stC.cart++;}else if(daysSince<=3){stage='\uac00\uc785';stC.signup++;}else{stage='\ubc29\ubb38';stC.visit++;}
+custFlows.push({name:r.name||'',memberId:mid,stage,visitDate,signupDate:dd(r.createdAt),cartCount:+(r['profile.cartCount']||0),lastUtm:r['profile.lastUtmSource']||'-'});});
+window._oktFlows={'\uad6c\ub9e4':custFlows.filter(x=>x.stage==='\uad6c\ub9e4'),'\uc7a5\ubc14\uad6c\ub2c8':custFlows.filter(x=>x.stage==='\uc7a5\ubc14\uad6c\ub2c8'),'\ubc29\ubb38':custFlows.filter(x=>x.stage==='\ubc29\ubb38'),'\uac00\uc785':custFlows.filter(x=>x.stage==='\uac00\uc785')};
+const total=oktCusts.length;let fh='<div style="font-size:12px;font-weight:600;margin-bottom:10px">OKS '+total+'\uba85 \ud604\uc7ac \uc704\uce58</div>';
+[{l:'\uac00\uc785 (3\uc77c \uc774\ub0b4)',n:stC.signup,c:'var(--t2)',k:'\uac00\uc785'},{l:'\ubc29\ubb38 (3\uc77c+)',n:stC.visit,c:'var(--y)',k:'\ubc29\ubb38'},{l:'\uc7a5\ubc14\uad6c\ub2c8 (\ubbf8\uad6c\ub9e4)',n:stC.cart,c:'var(--b)',k:'\uc7a5\ubc14\uad6c\ub2c8'},{l:'\uad6c\ub9e4 \uc644\ub8cc',n:stC.purchase,c:'var(--g)',k:'\uad6c\ub9e4'}].forEach(s=>{
+const w=Math.max(s.n/(total||1)*100,3);fh+='<div class="br" onclick="showFlow(\''+s.k+'\')"><div class="bl" style="width:160px">'+s.l+'</div><div class="bt"><div class="bf" style="width:'+w+'%;background:'+s.c+';">'+pc(s.n,total)+'</div></div><div class="bv">'+fm(s.n)+'\uba85</div></div>';});
+document.getElementById('okt-flow').innerHTML=fh;
+}catch(e){console.error('OKS flow:',e);document.getElementById('okt-flow').innerHTML='<p style="color:var(--t2)">'+e.message+'</p>';}
+
+// OKS NEW CUSTOMER TRACKING
+try{
+const crmIds=crm.map(r=>String(r.memberId||'').trim()).filter(Boolean);
+const today=new Date().toISOString().substring(0,10);
+const history=JSON.parse(localStorage.getItem('mmic_okt_history')||'{}');
+const prevDates=Object.keys(history).filter(d=>d<today).sort();
+const prevDate=prevDates.length?prevDates[prevDates.length-1]:null;
+const prevIds=prevDate?history[prevDate]:[];
+const prevSet=new Set(prevIds);
+const newCusts=prevIds.length>0?crm.filter(r=>{const mid=String(r.memberId||'').trim();return mid&&!prevSet.has(mid);}):[];
+history[today]=crmIds;const allDts=Object.keys(history).sort();while(allDts.length>30)delete history[allDts.shift()];
+localStorage.setItem('mmic_okt_history',JSON.stringify(history));
+if(newCusts.length>0){let nh='<div style="font-size:12px;font-weight:600;margin-bottom:6px">\uc2e0\uaddc '+newCusts.length+'\uba85 ('+prevDate+' \ub300\ube44)</div><div class="tw" style="max-height:200px"><table class="tb"><thead><tr><th>\uba85</th><th>MemberID</th><th>\ubc29\ubb38</th><th>\uac00\uc785</th><th>\uc7a5\ubc14\uad6c\ub2c8</th><th>\uc720\uc785</th></tr></thead><tbody>';
+newCusts.forEach(r=>nh+='<tr><td style="font-weight:500">'+(r.name||'-')+'</td><td style="font-size:10px">'+(r.memberId||'-')+'</td><td>'+(r['web.sessionsCount']||0)+'</td><td>'+dd(r.createdAt)+'</td><td>'+(r['profile.cartCount']||0)+'</td><td style="font-size:10px">'+(r['profile.lastUtmSource']||'-')+'</td></tr>');
+nh+='</tbody></table></div>';document.getElementById('okt-new').innerHTML=nh;}
+else{document.getElementById('okt-new').innerHTML='<p style="color:var(--t2)">'+(prevDate?'\uc2e0\uaddc \uc5c6\uc74c ('+prevDate+' \ub300\ube44)':'\uccab \ub85c\ub4dc \u2014 \ub0b4\uc77c\ubd80\ud130 \ucd94\uc801')+'</p>';}
+}catch(e){console.error('OKS new:',e);}
+
+// CRM SEND MATCHING
+try{
+const lms=D.lms||[],sendlog=D.sendlog||[];
+const crmByPhone={};crm.forEach(r=>{const ph=String(r['profile.mobileNumber']||'').trim();if(ph)crmByPhone[ph]=r;});
+const cvtPhone=p=>{if(!p)return'';return String(p).replace(/-/g,'').replace(/^0/,'82');};
+const lf=fc(lms[0]);const lmsPhone=lf?lf('\uc804\ud654\ubc88\ud638','phone'):null;const lmsDate=lf?lf('\ubc1c\uc1a1\uc77c\uc2dc'):null;const lmsContent=lf?lf('\ub0b4\uc6a9'):null;const lmsUtmS=lf?lf('utm_source','\uc18c\uc2a4'):null;
+let matched=0,unmatched=0;const matchedList=[];
+lms.forEach(r=>{const ph=cvtPhone(lmsPhone?r[lmsPhone]:'');const crmCust=crmByPhone[ph];
+if(crmCust){matched++;matchedList.push({name:crmCust.name||'',memberId:crmCust.memberId||'',sendDate:lmsDate?dd(r[lmsDate]):'',content:lmsContent?String(r[lmsContent]).substring(0,30):'',lmsUtm:lmsUtmS?r[lmsUtmS]||'':'',crmLastUtm:crmCust['profile.lastUtmSource']||''});}else{unmatched++;}});
+let sh='';
+if(lms.length>0){sh+='<div class="kr">'+kp('LMS \ubc1c\uc1a1',fm(lms.length))+kp('CRM \ub9e4\uce6d',fm(matched),pc(matched,lms.length),'var(--g)')+kp('UTM \uc77c\uce58',fm(matchedList.filter(x=>x.lmsUtm&&x.crmLastUtm&&String(x.crmLastUtm).includes(String(x.lmsUtm))).length),'','var(--ac)')+kp('\ubbf8\ub9e4\uce6d',fm(unmatched),'','var(--r)')+'</div>';
+if(matchedList.length){sh+='<div style="font-size:12px;font-weight:600;margin:8px 0 6px">\ub9e4\uce6d\ub41c \uace0\uac1d ('+matchedList.length+'\uba85)</div><div class="tw" style="max-height:250px"><table class="tb"><thead><tr><th>\uace0\uac1d\uba85</th><th>MemberID</th><th>\ubc1c\uc1a1\uc77c</th><th>\ub0b4\uc6a9</th><th>\ubc1c\uc1a1UTM</th><th>CRM lastUTM</th></tr></thead><tbody>';
+matchedList.forEach(r=>sh+='<tr><td style="font-weight:500">'+r.name+'</td><td style="font-size:10px">'+r.memberId+'</td><td>'+r.sendDate+'</td><td style="font-size:10px">'+r.content+'</td><td style="font-size:10px">'+r.lmsUtm+'</td><td style="font-size:10px">'+r.crmLastUtm+'</td></tr>');
+sh+='</tbody></table></div>';}}else{sh='<p style="color:var(--t2)">LMS \ub370\uc774\ud130 \uc5c6\uc74c</p>';}
+// SendLog
+const sf=fc(sendlog[0]);const slId=sf?sf('\ud68c\uc6d0 ID','\ud68c\uc6d0ID','memberId'):null;const slVisit=sf?sf('\ucd5c\ucd08 \ubc29\ubb38\uc77c\uc2dc'):null;const slPurchase=sf?sf('\ucd5c\ucd08 \uad6c\ub9e4\uc77c\uc2dc'):null;const slAmount=sf?sf('\ucd1d \uad6c\ub9e4\uae08\uc561'):null;
+if(sendlog.length>0&&slId){const oktById={};crm.forEach(r=>{const mid=String(r.memberId||'').trim();if(mid)oktById[mid]=r;});
+let slM=0,slP=0;const slList=[];
+sendlog.forEach(r=>{const sid=String(r[slId]||'').trim();const ok=oktById[sid];if(!ok)return;slM++;
+const vd=slVisit?dd(r[slVisit]):'-';const pd2=slPurchase?dd(r[slPurchase]):'-';const amt=slAmount?parseNum(r[slAmount]):0;
+const did=pd2&&pd2!=='-'&&amt>0;if(did)slP++;
+slList.push({name:ok.name||'',memberId:sid,visit:vd,purchase:pd2,amount:amt,did});});
+sh+='<div style="margin-top:16px;font-size:13px;font-weight:600;margin-bottom:8px">\ub370\uc774\ud130\ub77c\uc774\uc988 \ubc1c\uc1a1 (SendLog)</div><div class="kr">'+kp('SendLog',fm(sendlog.length))+kp('OKS \ub9e4\uce6d',fm(slM),pc(slM,sendlog.length),'var(--g)')+kp('\uad6c\ub9e4\uc804\ud658',fm(slP),pc(slP,slM),'var(--ac)')+kp('\ubbf8\uc804\ud658',fm(slM-slP),'','var(--r)')+'</div>';
+if(slList.length){sh+='<div class="tw" style="max-height:250px"><table class="tb"><thead><tr><th>\uace0\uac1d\uba85</th><th>\ud68c\uc6d0ID</th><th>\ucd5c\ucd08\ubc29\ubb38</th><th>\ucd5c\ucd08\uad6c\ub9e4</th><th>\ucd1d\uae08\uc561</th><th>\uc804\ud658</th></tr></thead><tbody>';
+slList.sort((a,b)=>b.amount-a.amount).slice(0,100).forEach(r=>sh+='<tr><td style="font-weight:500">'+r.name+'</td><td style="font-size:10px">'+r.memberId+'</td><td>'+r.visit+'</td><td>'+r.purchase+'</td><td style="font-family:DM Sans">'+fw(r.amount)+'</td><td>'+(r.did?'<span style="color:var(--g)">\u2713</span>':'-')+'</td></tr>');
+sh+='</tbody></table></div>';}}
+document.getElementById('crm-send').innerHTML=sh;
+}catch(e){console.error('CRM send:',e);document.getElementById('crm-send').innerHTML='<p style="color:var(--t2)">'+e.message+'</p>';}
+
+// CRM TIME
+try{buildCrmTime(D.lms||[],D.sendlog||[],crm,fo,oI,oD,oN,oNm);}catch(e){console.error('CRM time:',e);try{document.getElementById('ss-crm-time').innerHTML='<p style="color:var(--r)">CRM Time 오류: '+e.message+'</p>';}catch(e2){}try{document.getElementById('rp-crm-time').innerHTML='<p style="color:var(--r)">CRM Time 오류: '+e.message+'</p>';}catch(e3){}}
+// UTM MEMO
+try{
+const utmData=D.utm||[];
+console.log('UTM memo:',utmData.length,'rows');
+if(utmData.length>0)console.log('UTM cols:',Object.keys(utmData[0]));
+const uf=fc(utmData[0]);
+// Try to find relevant columns
+const cols=utmData[0]?Object.keys(utmData[0]):[];
+// Parse UTM memo: "숫자/숫자" = date, rest = memo
+const parseUtmDate=v=>{if(!v)return null;const s=String(v).trim();const m=s.match(/^(\d{1,2})\/(\d{1,2})/);if(m){const mon=+m[1],day=+m[2];const now=new Date();const yr=mon>now.getMonth()+1?now.getFullYear()-1:now.getFullYear();return{date:yr+'-'+String(mon).padStart(2,'0')+'-'+String(day).padStart(2,'0'),memo:s.replace(/^\d{1,2}\/\d{1,2}\s*/,'').trim()};}return null;};
+// Find UTM메모 column
+const memoCol=uf?uf('UTM\uba54\ubaa8','UTM \uba54\ubaa8','\uba54\ubaa8','memo'):null;
+console.log('UTM memo col:',memoCol);
+let memoHtml='';
+if(utmData.length>0&&memoCol){
+// Parse all entries
+const entries=[];
+utmData.forEach(r=>{const v=r[memoCol];if(!v)return;const parsed=parseUtmDate(v);if(parsed)entries.push(parsed);});
+entries.sort((a,b)=>b.date.localeCompare(a.date));
+if(entries.length){
+memoHtml+='<div class="tw" style="max-height:250px"><table class="tb"><thead><tr><th>\ub0a0\uc9dc</th><th>\uba54\ubaa8</th></tr></thead><tbody>';
+entries.forEach(e=>memoHtml+='<tr><td style="font-weight:500;white-space:nowrap">'+e.date+'</td><td style="font-size:11px">'+e.memo+'</td></tr>');
+memoHtml+='</tbody></table></div>';
+}else{memoHtml='<p style="color:var(--t2)">\ud30c\uc2f1 \uac00\ub2a5\ud55c \ub0a0\uc9dc \uc5c6\uc74c</p>';}
+} else if(utmData.length>0){
+// Fallback: show all columns
+memoHtml+='<div class="tw" style="max-height:250px"><table class="tb"><thead><tr>';
+cols.forEach(col=>memoHtml+='<th style="font-size:10px">'+col+'</th>');
+memoHtml+='</tr></thead><tbody>';
+utmData.slice(0,30).forEach(r=>{memoHtml+='<tr>';cols.forEach(col=>{const v=r[col];memoHtml+='<td style="font-size:10px">'+(v!=null?String(v).substring(0,50):'-')+'</td>';});memoHtml+='</tr>';});
+memoHtml+='</tbody></table></div>';
+} else {memoHtml='<p style="color:var(--t2)">UTM \uba54\ubaa8 \ub370\uc774\ud130 \uc5c6\uc74c</p>';}
+['utm-memo-ss','utm-memo-rp','utm-memo-cr'].forEach(id=>{
+try{document.getElementById(id).innerHTML=memoHtml;}catch(e){}});
+}catch(e){console.error('UTM memo:',e);}
+// WEEKLY
+try{saveWk({nCu,nAC,nB,nR,nL,nCr});renderWk();}catch(e){console.error('Wk:',e);}
+}
+
+function kp(l,v,s,c){return'<div class="kp"><div class="kl">'+l+'</div><div class="kv"'+(c?' style="color:'+c+'"':'')+'>'+v+'</div>'+(s?'<div class="ks">'+s+'</div>':'')+'</div>';}
+function mkbar(l,c,t,cl){const w=Math.max(c/(t||1)*100,5);return'<div class="br noc"><div class="bl">'+l+'</div><div class="bt"><div class="bf" style="width:'+w+'%;background:'+cl+';">'+pc(c,t)+'</div></div><div class="bv">'+fm(c)+'\uba85</div></div>';}
+function mf(id,data){const mx=data[0].v||1;let h='';data.forEach((s,i)=>{const w=Math.max(s.v/mx*100,8);const ck=s.k?' onclick="showFn(\''+s.k+'\')" style="cursor:pointer"':'';h+='<div class="fs"'+ck+'><div class="fl">'+s.l+'</div><div class="ft"><div class="fb" style="width:'+w+'%;background:'+s.c+';">'+pc(s.v,mx)+'</div></div><div class="fv">'+fm(s.v)+'\uba85</div></div>';if(i<data.length-1)h+='<div class="fa">\u2193 '+(data[i+1].v/(s.v||1)*100).toFixed(1)+'%</div>';});document.getElementById(id).innerHTML=h;}
+function showFn(key){const list=window._fnLists[key]||[];document.getElementById('mt').textContent=key+' ('+list.length+'\uba85)';document.getElementById('mi2').textContent='\ud68c\uc6d0\uac00\uc785\uc77c \ub0b4\ub9bc\ucc28\uc21c';
+// Get signup+lastorder from customer data
+const cd=D.customers||[];const cf2=fc(cd[0]);const cid2=cf2?cf2('\uc544\uc774\ub514'):null;const csd=cf2?cf2('\ud68c\uc6d0 \uac00\uc785\uc77c'):null;const clo=cf2?cf2('\ucd5c\uc885\uc8fc\ubb38\uc77c'):null;
+const cmap={};if(cid2)cd.forEach(r=>{const id=String(r[cid2]||'').trim();if(id)cmap[id]={signup:csd?dd(pd(r[csd])):'-',lastOrder:clo?dd(pd(r[clo])):'-'};});
+const sorted=[...list].sort((a,b)=>{const da=cmap[a.id]?cmap[a.id].signup:'';const db=cmap[b.id]?cmap[b.id].signup:'';return db.localeCompare(da);});
+let h='<table><thead><tr><th>#</th><th>ID</th><th>\uba85</th><th>\ud68c\uc6d0\uac00\uc785\uc77c</th><th>\ucd5c\uc885\uc8fc\ubb38\uc77c</th></tr></thead><tbody>';
+sorted.slice(0,200).forEach((r,i)=>{const cm=cmap[r.id]||{};h+='<tr><td>'+(i+1)+'</td><td>'+r.id+'</td><td>'+(r.name||'-')+'</td><td>'+(cm.signup||'-')+'</td><td>'+(cm.lastOrder||'-')+'</td></tr>';});
+h+='</tbody></table>';document.getElementById('ml2').innerHTML=h;document.getElementById('mo').classList.add('on');}
+function cm(){document.getElementById('mo').classList.remove('on');}
+
+function buildRet(buyers){const vb=buyers.filter(b=>b.orderDates.length>0);if(!vb.length){document.getElementById('rh').innerHTML='<p style="color:var(--t2)">\ub370\uc774\ud130 \uc5c6\uc74c</p>';return;}vb.forEach(b=>{b.orderDates.sort((a,c)=>a.date-c.date);b.firstDate=b.orderDates[0].date;b.firstMonth=b.firstDate.getFullYear()+'-'+String(b.firstDate.getMonth()+1).padStart(2,'0');});const ch={};vb.forEach(b=>{if(!ch[b.firstMonth])ch[b.firstMonth]={m:b.firstMonth,sz:0,rt:{}};ch[b.firstMonth].sz++;});_rl={};vb.forEach(b=>{b.orderDates.forEach(od=>{const off=(od.date.getFullYear()-b.firstDate.getFullYear())*12+od.date.getMonth()-b.firstDate.getMonth();if(off===0)return;const k=b.firstMonth+'_'+off;if(!ch[b.firstMonth].rt[off])ch[b.firstMonth].rt[off]=new Set();ch[b.firstMonth].rt[off].add(b.id);if(!_rl[k])_rl[k]={};_rl[k][b.id]=b.name;});});const so=Object.values(ch).sort((a,b)=>a.m.localeCompare(b.m)),mx=9,now=new Date();const gc=r=>{if(r===0)return{b:'#1a1a2e',t:'var(--t2)'};if(r<=1)return{b:'#1e1840',t:'#8888aa'};if(r<=3)return{b:'#2d1f5e',t:'#aaa0d0'};if(r<=6)return{b:'#5b3fa0',t:'#ddd5f0'};if(r<=10)return{b:'#7c5fd4',t:'#fff'};return{b:'#a29bfe',t:'#fff'};};let h='<table class="rt"><thead><tr><th>\ucf54\ud638\ud2b8</th><th>\ud06c\uae30</th>';for(let m=1;m<=mx;m++)h+='<th>M+'+m+'</th>';h+='</tr></thead><tbody>';so.forEach(c=>{if(c.sz<5)return;h+='<tr><td class="cl">'+c.m+'</td><td class="sc">'+fm(c.sz)+'</td>';for(let m=1;m<=mx;m++){const cp=c.m.split('-'),ty=+cp[0],tm=+cp[1],tgt=new Date(ty+Math.floor((tm+m-1)/12),(tm+m-1)%12);if(tgt>now)h+='<td><div class="rc" style="background:transparent;color:var(--bd)">-</div></td>';else{const set=c.rt[m],cnt=set?set.size:0,rate=cnt/c.sz*100,cl=gc(rate),k=c.m+'_'+m,has=_rl[k];h+='<td><div class="rc" style="background:'+cl.b+';color:'+cl.t+'"'+(has?' onclick="sr(\''+c.m+'\','+m+','+cnt+','+c.sz+')"':'')+'>'+rate.toFixed(1)+'%<span class="tp">'+cnt+'/'+c.sz+(has?' \xb7\ud074\ub9ad':'')+'</span></div></td>';}}h+='</tr>';});h+='</tbody></table>';document.getElementById('rh').innerHTML=h;}
+function sr(co,off,cnt,sz){const cs=_rl[co+'_'+off]||{};document.getElementById('mt').textContent=co+' \u2192 M+'+off;document.getElementById('mi2').textContent=cnt+'/'+sz+' ('+(cnt/sz*100).toFixed(1)+'%)';
+const cd=D.customers||[];const cf2=fc(cd[0]);const cid2=cf2?cf2('\uc544\uc774\ub514'):null;const csd=cf2?cf2('\ud68c\uc6d0 \uac00\uc785\uc77c'):null;
+const smap={};if(cid2&&csd)cd.forEach(r=>{const id=String(r[cid2]||'').trim();if(id)smap[id]=pd(r[csd]);});
+const AUG25=new Date(2025,7,25);
+let h='<table><thead><tr><th>#</th><th>ID</th><th>\uba85</th><th>\uac00\uc785\uc77c</th><th>\uac00\uc785\u2192\uad6c\ub9e4(\uc77c)</th></tr></thead><tbody>';let i=1;
+for(const[id,nm]of Object.entries(cs)){const sd=smap[id];const sdStr=sd?dd(sd):'-';
+const isBeforeAug25=sd&&sd<new Date(2025,7,25);
+const bm2=window._allBuyerMap?window._allBuyerMap[id]:null;
+let daysToP='-';if(sd&&bm2&&bm2.orderDates.length>0&&!isBeforeAug25){const first=bm2.orderDates.sort((a,b)=>a.date-b.date)[0].date;daysToP=Math.floor((first-sd)/864e5)+'\uc77c';}
+h+='<tr><td>'+i+++'</td><td>'+id+'</td><td>'+(nm||'-')+'</td><td>'+sdStr+'</td><td>'+daysToP+'</td></tr>';}
+h+='</tbody></table>';document.getElementById('ml2').innerHTML=h;document.getElementById('mo').classList.add('on');}
+function mkM(buyers){const mb={};buyers.forEach(b=>{b.orderDates.forEach(od=>{const m=od.date.getFullYear()+'-'+String(od.date.getMonth()+1).padStart(2,'0');if(!mb[m])mb[m]={o:0,c:new Set()};mb[m].o++;mb[m].c.add(b.id);});});const ms=Object.keys(mb).sort();let h='<div style="overflow-x:auto"><table class="tb"><thead><tr><th>\uc6d4</th><th>\uc8fc\ubb38</th><th>\uace0\uac1d</th></tr></thead><tbody>';ms.forEach(m=>h+='<tr><td>'+m+'</td><td style="font-family:DM Sans">'+fm(mb[m].o)+'</td><td style="font-family:DM Sans">'+fm(mb[m].c.size)+'</td></tr>');h+='</tbody></table></div>';document.getElementById('f3').innerHTML=h;}
+
+function buildRFM(cust,idCol,mCol,rCol,fCol,nameCol,exSet){
+if(!idCol||!mCol||!rCol||!fCol){document.getElementById('rf-grid').innerHTML='<p style="color:var(--t2)">\ucee8\ub7fc \uc778\uc2dd \ubd88\uac00: '+idCol+'/'+mCol+'/'+rCol+'/'+fCol+'</p>';return;}
+const NOW=new Date();
+const rfm=cust.map(r=>{
+const id=String(r[idCol]||'').trim();if(!id||exSet.has(id))return null;
+const m=parseNum(r[mCol]);if(m<30000)return null;
+const lastD=pd(r[rCol]);if(!lastD)return null;
+if(lastD<new Date(2025,7,25))return null;
+const rDays=Math.floor((NOW-lastD)/864e5);
+const f=parseNum(r[fCol]);if(f<1)return null;
+return{id,name:nameCol?r[nameCol]:'',r:rDays,f,m};
+}).filter(Boolean);
+console.log('RFM:',rfm.length,'from',cust.length);
+if(!rfm.length){document.getElementById('rf-grid').innerHTML='<p style="color:var(--t2)">\ub370\uc774\ud130 \uc5c6\uc74c (\ud544\ud130 \ud6c4)</p>';return;}
+const sM=rfm.map(x=>x.m).sort((a,b)=>a-b);
+const p25=sM[Math.floor(sM.length*0.25)],p50=sM[Math.floor(sM.length*0.5)],p75=sM[Math.floor(sM.length*0.75)],p90=sM[Math.floor(sM.length*0.9)],p95=sM[Math.floor(sM.length*0.95)],p97=sM[Math.floor(sM.length*0.97)],p99=sM[Math.floor(sM.length*0.99)];
+const medR=med(rfm.map(x=>x.r)),medF=med(rfm.map(x=>x.f));
+const segs={'Elite Active':{list:[],color:'#1a0a3e',desc:'M\u2265'+fw(p99)+' & R\u226490\uc77c'},'Elite Risk':{list:[],color:'#2a1a4e',desc:'M\u2265'+fw(p99)+' & R>90\uc77c'},'Top VIP':{list:[],color:'#2d1b69',desc:'M '+fw(p97)+'~'+fw(p99)+' & R\u226490\uc77c'},'Top VIP Risk':{list:[],color:'#3d2b79',desc:'M '+fw(p97)+'~'+fw(p99)+' & R>90\uc77c'},'VIP':{list:[],color:'#5b3fa0',desc:'M '+fw(p95)+'~'+fw(p97)+' & R\u226490\uc77c'},'VIP Risk':{list:[],color:'#7c5fd4',desc:'M '+fw(p95)+'~'+fw(p97)+' & R>90\uc77c'},'High Active':{list:[],color:'#00b894',desc:'M '+fw(p75)+'~'+fw(p95)+' & R\u226490\uc77c'},'High Cooling':{list:[],color:'#55efc4',desc:'M '+fw(p75)+'~'+fw(p95)+' & R>90\uc77c'},'Mid Active':{list:[],color:'#0984e3',desc:'M '+fw(p50)+'~'+fw(p75)+' & R\u2264120\uc77c'},'Mid Cooling':{list:[],color:'#74b9ff',desc:'M '+fw(p50)+'~'+fw(p75)+' & R>120\uc77c'},'Low Active':{list:[],color:'#fdcb6e',desc:'M '+fw(p25)+'~'+fw(p50)+' & R\u2264120\uc77c'},'Low Dormant':{list:[],color:'#e17055',desc:'M<'+fw(p25)}};
+rfm.forEach(x=>{if(x.m>=p99&&x.r<=90)segs['Elite Active'].list.push(x);else if(x.m>=p99)segs['Elite Risk'].list.push(x);else if(x.m>=p97&&x.r<=90)segs['Top VIP'].list.push(x);else if(x.m>=p97)segs['Top VIP Risk'].list.push(x);else if(x.m>=p95&&x.r<=90)segs['VIP'].list.push(x);else if(x.m>=p95)segs['VIP Risk'].list.push(x);else if(x.m>=p75&&x.r<=90)segs['High Active'].list.push(x);else if(x.m>=p75)segs['High Cooling'].list.push(x);else if(x.m>=p50&&x.r<=120)segs['Mid Active'].list.push(x);else if(x.m>=p50)segs['Mid Cooling'].list.push(x);else if(x.m>=p25&&x.r<=120)segs['Low Active'].list.push(x);else segs['Low Dormant'].list.push(x);});
+document.getElementById('k-rf').innerHTML=kp('\ubd84\uc11d\ub300\uc0c1',fm(rfm.length),'25.8.25\uc774\ud6c4 & 3\ub9cc+')+kp('M \uc911\uac04\uac12',fw(p50),'\uc2e4\uacb0\uc81c\uae08\uc561')+kp('R \uc911\uac04\uac12',medR+'\uc77c')+kp('F \uc911\uac04\uac12',medF+'\ud68c')+kp('M \uc0c1\uc7041%',fw(p99));
+try{
+var _s=function(n){return segs[n]&&segs[n].list?segs[n].list:[];};
+let gh='';const totalRev=rfm.reduce((s,x)=>s+x.m,0);
+try{
+console.log('RFM rendering',Object.keys(segs).length,'segments');
+for(const[name,seg]of Object.entries(segs)){
+if(!seg||!seg.list||seg.list.length===0)continue;
+const list=(seg&&seg.list)||[];const avgR=Math.round(list.reduce((s,x)=>s+x.r,0)/list.length);const mF=med(list.map(x=>x.f)),mM=med(list.map(x=>x.m));
+gh+='<div class="seg-card" data-seg="'+name+'" onclick="showSeg(this.dataset.seg)"><div><span class="seg-dot" style="background:'+seg.color+'"></span><span class="seg-nm">'+name+'</span></div><div class="seg-ct">'+fm(list.length)+'<span style="font-size:11px;color:var(--t2);font-weight:400"> \uba85</span></div><div style="font-size:10px;color:var(--t2)">'+seg.desc+'</div><div class="seg-st"><div><div class="seg-sl">M \uc911\uac04</div><div class="seg-sv">'+fw(mM)+'</div></div><div><div class="seg-sl">R \ud3c9\uade0</div><div class="seg-sv">'+avgR+'\uc77c</div></div><div><div class="seg-sl">F \uc911\uac04</div><div class="seg-sv">'+mF+'\ud68c</div></div></div></div>';}
+}catch(renderErr){console.error('RFM render error:',renderErr);gh='<p style="color:var(--r)">렌더링 오류: '+renderErr.message+'</p>';}
+document.getElementById('rf-grid').innerHTML=gh||'<p style="color:var(--t2)">세그먼트 없음</p>';
+let rh='';for(const[n,seg]of Object.entries(segs)){if(!seg||!seg.list||!seg.list.length)continue;const rev=((seg&&seg.list)||[]).reduce((s,x)=>s+x.m,0);rh+=mkbar(n,rev,totalRev,seg.color).replace('\uba85','');}
+document.getElementById('rf-rev').innerHTML=rh;
+window._rfmSegs=segs;try{var _s=function(n){return segs[n]?segs[n].list.length:0;};saveWk({rfElite:_s('Elite Active')+_s('Elite Risk'),rfTopVIP:_s('Top VIP')+_s('Top VIP Risk'),rfVIP:_s('VIP')+_s('VIP Risk'),rfHigh:_s('High Active')+_s('High Cooling'),rfMid:_s('Mid Active')+_s('Mid Cooling'),rfLow:_s('Low Active')+_s('Low Dormant')});}catch(e){}
+}catch(_e){console.error('RFM render:',_e);}
+}
+function showSeg(name){const seg=window._rfmSegs[name];if(!seg)return;document.getElementById('mt').textContent=name+' ('+seg.list.length+'\uba85)';document.getElementById('mi2').textContent=seg.desc+' | M\uc21c';const s=[...seg.list].sort((a,b)=>b.m-a.m);let h='<table><thead><tr><th>#</th><th>ID</th><th>\uba85</th><th>R</th><th>F</th><th>M</th></tr></thead><tbody>';s.slice(0,200).forEach((c,i)=>h+='<tr><td>'+(i+1)+'</td><td>'+c.id+'</td><td>'+(c.name||'-')+'</td><td>'+c.r+'\uc77c</td><td>'+c.f+'</td><td>'+fw(c.m)+'</td></tr>');h+='</tbody></table>';document.getElementById('ml2').innerHTML=h;document.getElementById('mo').classList.add('on');}
+
+// 26SS RFM (M > F > R)
+function buildRFM26SS(orders,oI,oD,oN,oNm,oAmt,exSet,cust,cuId,cuDateCol,refundData,cardCancelData){
+// 26SS RFM: M/F/R calculated from ORDER DATA (2026-02-20 이후 주문만)
+const SS=new Date(2026,1,20),NOW=new Date();
+// Filter orders to 26SS + exclude
+const fo26=orders.filter(r=>{
+const d=oD?pd(r[oD]):null;if(!d||d<SS)return false;
+const id=oI?String(r[oI]||'').trim():'';if(!id||exSet.has(id))return false;
+return true;});
+// Build per-customer stats from orders
+const bm={};
+fo26.forEach(r=>{
+const id=oI?String(r[oI]||'').trim():null;if(!id)return;
+const no=oN?r[oN]:null;
+if(!bm[id])bm[id]={id,name:oNm?r[oNm]:'',nos:new Set(),m:0,lastD:null};
+if(no&&!bm[id].nos.has(no)){bm[id].nos.add(no);const _amt=oAmt?parseNum(r[oAmt]):0;bm[id].m+=_amt;if(!bm[id].orderAmts)bm[id].orderAmts={};bm[id].orderAmts[String(no).trim()]=_amt;
+const d=oD?pd(r[oD]):null;if(d&&(!bm[id].lastD||d>bm[id].lastD))bm[id].lastD=d;}});
+// Apply refund/cancel: sequential override (환불→입금전취소→취소→카드취소)
+const cancelSheets=[
+{data:refundData,label:'\ud658\ubd88'},
+{data:D.precancel||[],label:'\uc785\uae08\uc804\ucde8\uc18c'},
+{data:D.cancel||[],label:'\ucde8\uc18c'},
+{data:cardCancelData,label:'\uce74\ub4dc\ucde8\uc18c'}
+];
+const finalAmtMap={};
+cancelSheets.forEach(sheet=>{
+if(!sheet.data||!sheet.data.length)return;
+const sf2=fc(sheet.data[0]);
+const sON=sf2?sf2('\uc8fc\ubb38\ubc88\ud638'):null;
+const sAmt=sf2?sf2('\ucd1d \uacb0\uc81c\uae08\uc561','\ucd1d\uacb0\uc81c\uae08\uc561','\uacb0\uc81c\uae08\uc561'):null;
+if(!sON||!sAmt)return;
+let cnt=0;
+sheet.data.forEach(r=>{const no=String(r[sON]||'').trim();if(no){finalAmtMap[no]=parseNum(r[sAmt]);cnt++;}});
+console.log(sheet.label+':',cnt,'orders matched');
+});
+console.log('Total cancel/refund orders:',Object.keys(finalAmtMap).length);
+// Recalculate M per customer
+for(const[id,b]of Object.entries(bm)){
+let adjM=0;
+b.nos.forEach(no=>{
+const noStr=String(no).trim();
+if(finalAmtMap.hasOwnProperty(noStr)){adjM+=finalAmtMap[noStr];}
+else{adjM+=b.orderAmts&&b.orderAmts[noStr]?b.orderAmts[noStr]:0;}
+});
+b.m=adjM;
+}
+// Build RFM array (30K+ M filter)
+const custSignup={};
+if(cust&&cuId&&cuDateCol)cust.forEach(r=>{const id=String(r[cuId]||'').trim();if(id)custSignup[id]=pd(r[cuDateCol]);});
+const rfm=Object.values(bm).filter(b=>b.m>=30000&&b.lastD).map(b=>{
+const rDays=Math.floor((NOW-b.lastD)/864e5);
+const signD=custSignup[b.id];
+const isNewSS=signD&&signD>=SS;
+return{id:b.id,name:b.name,r:rDays,f:b.nos.size,m:b.m,signupDate:isNewSS?dd(signD):''};});
+console.log('26SS RFM (order-based):',rfm.length,'from',Object.keys(bm).length);
+if(!rfm.length){document.getElementById('ss-grid').innerHTML='<p style="color:var(--t2)">데이터 없음</p>';return;}
+const sM=rfm.map(x=>x.m).sort((a,b)=>a-b);
+const p50=sM[Math.floor(sM.length*0.5)],p75=sM[Math.floor(sM.length*0.75)],p90=sM[Math.floor(sM.length*0.9)],p95=sM[Math.floor(sM.length*0.95)],p97=sM[Math.floor(sM.length*0.97)],p99=sM[Math.floor(sM.length*0.99)];
+const medF=med(rfm.map(x=>x.f)),medR=med(rfm.map(x=>x.r));
+const fT=Math.max(medF+1,2);
+const segs={
+'Diamond':{list:[],color:'#080318',desc:'M\u2265'+fw(p99)+' & F\u2265'+fT+' \u2014 TOP 1%'},
+'Platinum':{list:[],color:'#0d0520',desc:'M '+fw(p97)+'~'+fw(p99)+' & F\u2265'+fT},
+'Top Elite':{list:[],color:'#1a0a3e',desc:'M '+fw(p95)+'~'+fw(p97)+' & F\u2265'+fT},
+'Elite Repeat':{list:[],color:'#2d1b69',desc:'M '+fw(p90)+'~'+fw(p95)+' & F\u2265'+fT},
+'Elite Single':{list:[],color:'#3d2b79',desc:'M\u2265'+fw(p90)+' & F<'+fT},
+'High Repeat':{list:[],color:'#00b894',desc:'M '+fw(p75)+'~'+fw(p90)+' & F\u2265'+fT},
+'High Single':{list:[],color:'#55efc4',desc:'M '+fw(p75)+'~'+fw(p90)+' & F<'+fT},
+'Mid Repeat':{list:[],color:'#0984e3',desc:'M '+fw(p50)+'~'+fw(p75)+' & F\u2265'+fT},
+'Mid Single':{list:[],color:'#74b9ff',desc:'M '+fw(p50)+'~'+fw(p75)+' & F<'+fT},
+'Low Repeat':{list:[],color:'#fdcb6e',desc:'M<'+fw(p50)+' & F\u2265'+fT},
+'Low Single':{list:[],color:'#e17055',desc:'M<'+fw(p50)+' & F<'+fT}};
+rfm.forEach(x=>{
+if(x.m>=p99&&x.f>=fT)segs['Diamond'].list.push(x);
+else if(x.m>=p97&&x.f>=fT)segs['Platinum'].list.push(x);
+else if(x.m>=p95&&x.f>=fT)segs['Top Elite'].list.push(x);
+else if(x.m>=p90&&x.f>=fT)segs['Elite Repeat'].list.push(x);
+else if(x.m>=p90)segs['Elite Single'].list.push(x);
+else if(x.m>=p75&&x.f>=fT)segs['High Repeat'].list.push(x);
+else if(x.m>=p75)segs['High Single'].list.push(x);
+else if(x.m>=p50&&x.f>=fT)segs['Mid Repeat'].list.push(x);
+else if(x.m>=p50)segs['Mid Single'].list.push(x);
+else if(x.f>=fT)segs['Low Repeat'].list.push(x);
+else segs['Low Single'].list.push(x);});
+document.getElementById('k-ss').innerHTML=kp('\ubd84\uc11d',fm(rfm.length),'26SS \uc8fc\ubb38\uae30\uc900')+kp('M \uc911\uac04',fw(p50))+kp('F \uc911\uac04',medF+'\ud68c')+kp('F \uae30\uc900',fT+'\ud68c+')+kp('R \uc911\uac04',medR+'\uc77c')+kp('M 1%',fw(p99));
+let gh='';const totalRev=rfm.reduce((s,x)=>s+x.m,0);
+for(const[name,seg]of Object.entries(segs)){if(!seg||!seg.list||!seg.list.length)continue;const list=seg.list;
+const avgR=Math.round(list.reduce((s,x)=>s+x.r,0)/list.length);const mF=med(list.map(x=>x.f)),mM=med(list.map(x=>x.m));
+const newCnt=list.filter(x=>x.signupDate).length;
+gh+='<div class="seg-card" data-seg="'+name+'" onclick="showSS(this.dataset.seg)"><div><span class="seg-dot" style="background:'+seg.color+'"></span><span class="seg-nm">'+name+'</span></div><div class="seg-ct">'+fm(list.length)+'<span style="font-size:11px;color:var(--t2);font-weight:400"> \uba85'+(newCnt?' (\uc2e0\uaddc'+newCnt+')':'')+'</span></div><div style="font-size:10px;color:var(--t2)">'+seg.desc+'</div><div class="seg-st"><div><div class="seg-sl">M \uc911\uac04</div><div class="seg-sv">'+fw(mM)+'</div></div><div><div class="seg-sl">F \uc911\uac04</div><div class="seg-sv">'+mF+'\ud68c</div></div><div><div class="seg-sl">R \ud3c9\uade0</div><div class="seg-sv">'+avgR+'\uc77c</div></div></div></div>';}
+document.getElementById('ss-grid').innerHTML=gh||'<p style="color:var(--t2)">\uc138\uadf8\uba3c\ud2b8 \uc5c6\uc74c</p>';
+let rh='';for(const[n,seg]of Object.entries(segs)){if(!seg||!seg.list||!seg.list.length)continue;const rev=((seg&&seg.list)||[]).reduce((s,x)=>s+x.m,0);rh+=mkbar(n,rev,totalRev,seg.color).replace('\uba85','');}
+document.getElementById('ss-rev').innerHTML=rh;
+window._ssSegs=segs;
+var _sc=function(n){return segs[n]&&segs[n].list?segs[n].list.length:0;};
+try{saveWk({ssElite:_sc('Diamond')+_sc('Platinum')+_sc('Top Elite')+_sc('Elite Repeat')+_sc('Elite Single'),ssHigh:_sc('High Repeat')+_sc('High Single'),ssMid:_sc('Mid Repeat')+_sc('Mid Single'),ssLow:_sc('Low Repeat')+_sc('Low Single')});}catch(e){}}
+
+function showSS(name){const seg=window._ssSegs[name];if(!seg)return;document.getElementById('mt').textContent='26SS '+name+' ('+seg.list.length+'\uba85)';document.getElementById('mi2').textContent=seg.desc+' | M\uc21c';const s=[...seg.list].sort((a,b)=>b.m-a.m);let h='<table><thead><tr><th>#</th><th>ID</th><th>\uba85</th><th>M</th><th>F</th><th>R</th><th>26SS\uc2e0\uaddc</th></tr></thead><tbody>';s.slice(0,200).forEach((c2,i)=>h+='<tr><td>'+(i+1)+'</td><td>'+c2.id+'</td><td>'+(c2.name||'-')+'</td><td>'+fw(c2.m)+'</td><td>'+c2.f+'\ud68c</td><td>'+c2.r+'\uc77c</td><td style="color:var(--g)">'+(c2.signupDate||'-')+'</td></tr>');h+='</tbody></table>';document.getElementById('ml2').innerHTML=h;document.getElementById('mo').classList.add('on');}
+
+
+// 재구매 단골 (26SS 이후 2회+ 구매)
+function buildRepeat(orders,oI,oD,oN,oNm,oAmt,oCpn,oProdNm,refundData,cardCancelData){
+const SS=new Date(2026,1,20);
+// Filter 26SS이후 + 30K+
+const fo26=orders.filter(r=>{const d=oD?pd(r[oD]):null;return d&&d>=SS;});
+// Build buyer map
+const bm2={};
+fo26.forEach(r=>{const id=oI?String(r[oI]||'').trim():null;if(!id)return;
+if(!bm2[id])bm2[id]={id,name:oNm?r[oNm]:'',nos:new Set(),totalAmt:0};
+const no=oN?r[oN]:null;
+if(no&&!bm2[id].nos.has(no)){bm2[id].nos.add(no);const _a2=oAmt?parseNum(r[oAmt]):0;bm2[id].totalAmt+=_a2;if(!bm2[id].orderAmts2)bm2[id].orderAmts2={};bm2[id].orderAmts2[String(no).trim()]=_a2;}});
+// Apply refund/cancel adjustments (sequential override)
+const cSheets2=[
+{data:refundData,label:'\ud658\ubd88'},
+{data:D.precancel||[],label:'\uc785\uae08\uc804\ucde8\uc18c'},
+{data:D.cancel||[],label:'\ucde8\uc18c'},
+{data:cardCancelData,label:'\uce74\ub4dc\ucde8\uc18c'}
+];
+const fAmtMap2={};
+cSheets2.forEach(sheet=>{
+if(!sheet.data||!sheet.data.length)return;
+const sf3=fc(sheet.data[0]);
+const sON2=sf3?sf3('\uc8fc\ubb38\ubc88\ud638'):null;
+const sAmt2=sf3?sf3('\ucd1d \uacb0\uc81c\uae08\uc561','\ucd1d\uacb0\uc81c\uae08\uc561','\uacb0\uc81c\uae08\uc561'):null;
+if(!sON2||!sAmt2)return;
+sheet.data.forEach(r=>{const no=String(r[sON2]||'').trim();if(no)fAmtMap2[no]=parseNum(r[sAmt2]);});
+});
+for(const b of Object.values(bm2)){let adj=0;b.nos.forEach(no=>{const ns=String(no).trim();adj+=fAmtMap2.hasOwnProperty(ns)?fAmtMap2[ns]:(b.orderAmts2&&b.orderAmts2[ns]?b.orderAmts2[ns]:0);});b.totalAmt=adj;}
+// Filter 2+ orders
+const repeaters=Object.values(bm2).filter(b=>b.nos.size>=2);
+const maxF=Math.max(...repeaters.map(b=>b.nos.size),0);
+// Group by purchase count
+const groups={};
+repeaters.forEach(b=>{const f=b.nos.size;const key=f>=5?'5\ud68c+':f+'\ud68c';if(!groups[key])groups[key]={list:[],f:f>=5?5:f};groups[key].list.push(b);});
+const sortedGroups=Object.entries(groups).sort((a,b)=>b[1].f-a[1].f);
+// KPIs
+const totalRep=repeaters.length;const totalRev=repeaters.reduce((s,b)=>s+b.totalAmt,0);
+const avgF=totalRep>0?Math.round(repeaters.reduce((s,b)=>s+b.nos.size,0)/totalRep*10)/10:0;
+document.getElementById('k-rp').innerHTML=kp('26SS \uc7ac\uad6c\ub9e4',fm(totalRep),'2\ud68c+ \uad6c\ub9e4')+kp('\ucd1d \ub9e4\ucd9c',fw(totalRev))+kp('\ud3c9\uade0 \uad6c\ub9e4\ud68c\uc218',avgF+'\ud68c')+kp('\ucd5c\ub300',maxF+'\ud68c');
+// Segment bars + lists
+window._rpGroups={};
+let h='';
+sortedGroups.forEach(([key,g])=>{
+window._rpGroups[key]=g.list;
+const rev=g.list.reduce((s,b)=>s+b.totalAmt,0);
+h+='<div class="br" onclick="showRP(\''+key+'\')"><div class="bl">'+key+'</div><div class="bt"><div class="bf" style="width:'+Math.max(g.list.length/(totalRep||1)*100,5)+'%;background:var(--ac);">'+fm(g.list.length)+'\uba85</div></div><div class="bv">'+fw(rev)+'</div></div>';
+});
+if(!h)h='<p style="color:var(--t2)">26SS \uc774\ud6c4 \uc7ac\uad6c\ub9e4 \uace0\uac1d \uc5c6\uc74c</p>';
+document.getElementById('rp-segs').innerHTML=h;
+// Analysis graphs for repeat customers
+const repIds=new Set(repeaters.map(b=>b.id));
+const repOrders=fo26.filter(r=>repIds.has(oI?String(r[oI]||'').trim():''));
+console.log('RepeatAnalysis: fo26=',fo26.length,'repeaters=',repeaters.length,'repOrders=',repOrders.length);
+if(repOrders.length>0)console.log('RepeatOrder cols:',Object.keys(repOrders[0]));
+if(repOrders.length===0){
+document.getElementById('rp-cpn').innerHTML='<p style="color:var(--t2)">주문 데이터 없음 (repOrders=0, fo26='+fo26.length+', repeaters='+repeaters.length+')</p>';
+document.getElementById('rp-prod').innerHTML='<p style="color:var(--t2)">데이터 없음</p>';
+document.getElementById('rp-hour').innerHTML='<p style="color:var(--t2)">데이터 없음</p>';
+document.getElementById('rp-pts').innerHTML='<p style="color:var(--t2)">데이터 없음</p>';
+}else{
+const _cuData=D.customers||[];const _cf=fc(_cuData[0]);
+const _cuId2=_cf?_cf('\uc544\uc774\ub514'):null;const _cuDt2=_cf?_cf('\ud68c\uc6d0 \uac00\uc785\uc77c'):null;
+const _signMap2={};if(_cuId2&&_cuDt2)_cuData.forEach(r=>{const id=String(r[_cuId2]||'').trim();if(id)_signMap2[id]=dd(r[_cuDt2]);});
+const oPts2=Object.keys(repOrders[0]||{}).find(k=>k.includes('\uc801\ub9bd\uae08\uc561'))||null;
+// Build detail maps for click
+// Count items per order number first
+const orderCntMap={};repOrders.forEach(r=>{const no=oN?String(r[oN]||'').trim():'';if(no)orderCntMap[no]=(orderCntMap[no]||0)+1;});
+window._rpCpnMap={};window._rpPtsMap2={};
+repOrders.forEach(r=>{
+const id=oI?String(r[oI]||'').trim():'';if(!id)return;
+const nm=oNm?r[oNm]||'':'';
+const cpn=oCpn?(r[oCpn]&&String(r[oCpn]).trim()?String(r[oCpn]).trim():'\ucfe0\ud3f0 \ubbf8\uc0ac\uc6a9'):'\ucfe0\ud3f0 \ubbf8\uc0ac\uc6a9';
+const orderD=oD?dd(r[oD]):'-';
+const no=oN?String(r[oN]||'').trim():'';
+const qty=orderCntMap[no]||1;
+const pts=oPts2?parseNum(r[oPts2]):0;
+const ptsLabel=pts>0?'\uc801\ub9bd\uae08 \uc0ac\uc6a9':'\ubbf8\uc0ac\uc6a9';
+const detail={id,name:nm,orderDate:orderD,qty,pts,cpn,signup:_signMap2[id]||'-'};
+if(!window._rpCpnMap[cpn])window._rpCpnMap[cpn]=[];
+window._rpCpnMap[cpn].push(detail);
+if(!window._rpPtsMap2[ptsLabel])window._rpPtsMap2[ptsLabel]=[];
+window._rpPtsMap2[ptsLabel].push(detail);});
+// Coupon bars (clickable)
+const cpnMap={};repOrders.forEach(r=>{const no=oN?r[oN]:null;if(!no)return;const cpn=oCpn?(r[oCpn]&&String(r[oCpn]).trim()?String(r[oCpn]).trim():'\ucfe0\ud3f0 \ubbf8\uc0ac\uc6a9'):'\ucfe0\ud3f0 \ubbf8\uc0ac\uc6a9';cpnMap[cpn]=(cpnMap[cpn]||0)+1;});
+const cpnArr=Object.entries(cpnMap).sort((a,b)=>b[1]-a[1]);const cpnTot=cpnArr.reduce((s,x)=>s+x[1],0);
+const cls3=['var(--ac)','var(--tl)','var(--b)','var(--g)','var(--y)','var(--o)','var(--r)','var(--t2)'];
+let ch2='';cpnArr.slice(0,10).forEach((s,i)=>{const w=Math.max(s[1]/(cpnArr[0][1]||1)*100,5);const safe=s[0].replace(/'/g,"\\'");ch2+='<div class="br" onclick="showRpDetail(\'cpn\',\''+safe+'\')"><div class="bl" style="width:150px;font-size:10px">'+s[0]+'</div><div class="bt"><div class="bf" style="width:'+w+'%;background:'+cls3[i%8]+';">'+pc(s[1],cpnTot)+'</div></div><div class="bv">'+fm(s[1])+'\uac74</div></div>';});
+document.getElementById('rp-cpn').innerHTML=ch2||'<p style="color:var(--t2)">\uc5c6\uc74c</p>';
+// Product
+const prodMap={};repOrders.forEach(r=>{const p=oProdNm?r[oProdNm]:null;if(p)prodMap[p]=(prodMap[p]||0)+1;});
+const prodArr=Object.entries(prodMap).sort((a,b)=>b[1]-a[1]);
+let ph2='';prodArr.slice(0,15).forEach((s,i)=>{const w=Math.max(s[1]/(prodArr[0][1]||1)*100,5);ph2+='<div class="br noc"><div class="bl" style="width:150px;font-size:10px">'+s[0]+'</div><div class="bt"><div class="bf" style="width:'+w+'%;background:'+cls3[i%8]+';">'+fm(s[1])+'</div></div><div class="bv">'+fm(s[1])+'\uac74</div></div>';});
+document.getElementById('rp-prod').innerHTML=ph2||'<p style="color:var(--t2)">\uc5c6\uc74c</p>';
+// Hour TOP5
+const hourMap={};repOrders.forEach(r=>{const d=oD?pd(r[oD]):null;if(d){const h=d.getHours();const label=h+'~'+(h+1)+'\uc2dc';hourMap[label]=(hourMap[label]||0)+1;}});
+const hourArr=Object.entries(hourMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+const hourMax=Math.max(...hourArr.map(x=>x[1]),1);
+let hh2='';hourArr.forEach((s,i)=>{const w=Math.max(s[1]/hourMax*100,3);hh2+='<div class="br noc"><div class="bl" style="width:60px">'+s[0]+'</div><div class="bt"><div class="bf" style="width:'+w+'%;background:var(--ac);">'+fm(s[1])+'</div></div><div class="bv">'+fm(s[1])+'\uac74</div></div>';});
+document.getElementById('rp-hour').innerHTML=hh2||'<p style="color:var(--t2)">\uc5c6\uc74c</p>';
+// Points (clickable)
+if(oPts2){
+let usedPts=0,noPts=0;
+repOrders.forEach(r=>{const p=parseNum(r[oPts2]);if(p>0)usedPts++;else noPts++;});
+const pw1=Math.max(usedPts/((usedPts+noPts)||1)*100,5),pw2=Math.max(noPts/((usedPts+noPts)||1)*100,5);
+document.getElementById('rp-pts').innerHTML='<div class="br" onclick="showRpDetail(\'pts\',\'\uc801\ub9bd\uae08 \uc0ac\uc6a9\')"><div class="bl">\uc801\ub9bd\uae08 \uc0ac\uc6a9</div><div class="bt"><div class="bf" style="width:'+pw1+'%;background:var(--ac);">'+pc(usedPts,usedPts+noPts)+'</div></div><div class="bv">'+fm(usedPts)+'\uba85</div></div><div class="br" onclick="showRpDetail(\'pts\',\'\ubbf8\uc0ac\uc6a9\')"><div class="bl">\ubbf8\uc0ac\uc6a9</div><div class="bt"><div class="bf" style="width:'+pw2+'%;background:var(--t2);">'+pc(noPts,usedPts+noPts)+'</div></div><div class="bv">'+fm(noPts)+'\uba85</div></div>';
+}else{document.getElementById('rp-pts').innerHTML='<p style="color:var(--t2)">\uc801\ub9bd\uae08 \ucee8\ub7fc \uc5c6\uc74c</p>';}
+}// end repOrders else
+try{saveWk({rpTotal:totalRep,rpRev:totalRev});}catch(e){}}
+function showRP(key){const list=window._rpGroups[key]||[];document.getElementById('mt').textContent='26SS '+key+' \uc7ac\uad6c\ub9e4 ('+list.length+'\uba85)';document.getElementById('mi2').textContent='\ucd1d\uacb0\uc81c\uae08\uc561\uc21c';const s=[...list].sort((a,b)=>b.totalAmt-a.totalAmt);let h='<table><thead><tr><th>#</th><th>ID</th><th>\uba85</th><th>\uad6c\ub9e4\ud68c\uc218</th><th>\ucd1d\uacb0\uc81c</th></tr></thead><tbody>';s.slice(0,200).forEach((b,i)=>h+='<tr><td>'+(i+1)+'</td><td>'+b.id+'</td><td>'+(b.name||'-')+'</td><td>'+b.nos.size+'\ud68c</td><td>'+fw(b.totalAmt)+'</td></tr>');h+='</tbody></table>';document.getElementById('ml2').innerHTML=h;document.getElementById('mo').classList.add('on');}
+
+function mkCart(cart,bm,cId,cDate,cName,cProd,cProdNm){if(!cart.length||!cId){try{saveWk({caConv:0,caNoconv:0});}catch(e){}document.getElementById('k3').innerHTML=kp('\ud65c\uc131\uc7a5\ubc14\uad6c\ub2c8','0');document.getElementById('ca1').innerHTML='<p style="color:var(--t2)">\uc5c6\uc74c</p>';return;}
+const cc={};cart.forEach(r=>{const id=String(r[cId]||'').trim();if(!id)return;const d=cDate?pd(r[cDate]):null;if(!cc[id])cc[id]={id,name:cName?r[cName]:'',cartDate:d,prods:[]};if(cProdNm)cc[id].prods.push(r[cProdNm]);else if(cProd)cc[id].prods.push(r[cProd]);});
+let conv=0,noconv=0;const cL=[],nL=[];
+for(const[cid,cu]of Object.entries(cc)){const buyer=bm[cid];let did=false,cnt=0;
+if(buyer&&buyer.orderDates.length>0&&cu.cartDate){const af=buyer.orderDates.filter(od=>od.date>=cu.cartDate);cnt=af.length;did=cnt>0;}
+const purchProds=buyer&&buyer.prodNames?buyer.prodNames.slice(0,5).join(', '):'';
+const e={id:cid,name:cu.name,cd:dd(cu.cartDate),cnt,prods:cu.prods.join(', '),purchProds};
+if(did){conv++;cL.push(e);}else{noconv++;nL.push(e);}}
+const tot=Object.keys(cc).length;try{saveWk({caConv:conv,caNoconv:noconv});}catch(e){}
+window._cartLists={all:Object.values(cc).map(cu=>({id:cu.id,name:cu.name,cd:dd(cu.cartDate),prods:cu.prods.join(', ')})),conv:cL,noconv:nL};
+document.getElementById('k3').innerHTML='<div class="kp" style="cursor:pointer" onclick="showCartList(\'all\')"><div class="kl">\ud65c\uc131 \uc7a5\ubc14\uad6c\ub2c8</div><div class="kv">'+fm(tot)+'</div></div><div class="kp" style="cursor:pointer" onclick="showCartList(\'conv\')"><div class="kl">\uc804\ud658</div><div class="kv" style="color:var(--g)">'+fm(conv)+'</div><div class="ks">'+pc(conv,tot)+'</div></div><div class="kp" style="cursor:pointer" onclick="showCartList(\'noconv\')"><div class="kl">\ubbf8\uc804\ud658</div><div class="kv" style="color:var(--r)">'+fm(noconv)+'</div><div class="ks">'+pc(noconv,tot)+'</div></div>';
+let h=mkbar('\uc804\ud658',conv,tot,'var(--g)')+mkbar('\ubbf8\uc804\ud658',noconv,tot,'var(--r)');
+const SIG_C=["Studio Jacket","Razor Jacket","Sway Shirt","Matinee Shirt","Insert Knit","Overlay Longsleeve","Cruiser Jeans","Off Jeans","Sundown Shirt","Glint Shirt","Sunstripe Polo","Cruiser Tee","Deadstock Tee","Hustler Half Zip","Morrison Bermuda","Square Cut Tank","Shadow Tee"];
+const isSigC=p=>{if(!p)return false;const u=p.toUpperCase();return SIG_C.some(s=>u.includes(s.toUpperCase()));};
+const sigNever=nL.filter(r=>(!bm[r.id]||bm[r.id].orderNos.size===0)&&r.prods.split(', ').some(p=>isSigC(p)));
+sigNever.sort((a,b)=>(b.cd||'').localeCompare(a.cd||''));
+if(sigNever.length){// Get signup dates for cart customers
+const _cCuData=D.customers||[];const _cCf=fc(_cCuData[0]);const _cCuId=_cCf?_cCf('\uc544\uc774\ub514'):null;const _cCuDt=_cCf?_cCf('\ud68c\uc6d0 \uac00\uc785\uc77c'):null;
+const _cSignMap={};if(_cCuId&&_cCuDt)_cCuData.forEach(r=>{const id=String(r[_cCuId]||'').trim();if(id)_cSignMap[id]=dd(pd(r[_cCuDt]));});
+h+='<div style="margin-top:14px;font-size:12px;font-weight:600">\uc2dc\uadf8\ub2c8\ucc98 \uc7a5\ubc14\uad6c\ub2c8 \ubbf8\uad6c\ub9e4 ('+sigNever.length+'\uba85)</div><div class="tw" style="max-height:300px;margin-top:6px"><table class="tb"><thead><tr><th>\uace0\uac1d\uba85</th><th>ID</th><th>\uac00\uc785\uc77c</th><th>\ub2f4\uc740\ub0a0\uc9dc</th><th>\uc0c1\ud488</th></tr></thead><tbody>';sigNever.slice(0,50).forEach(r=>h+='<tr><td style="font-weight:500">'+r.name+'</td><td style="font-size:10px">'+r.id+'</td><td>'+(_cSignMap[r.id]||'-')+'</td><td>'+r.cd+'</td><td style="font-size:10px;max-width:250px;white-space:normal">'+r.prods+'</td></tr>');h+='</tbody></table></div>';}
+document.getElementById('ca1').innerHTML=h;}
+function showFlow(stage){
+const list=window._oktFlows[stage]||[];
+document.getElementById('mt').textContent=stage+' ('+list.length+'\uba85)';
+document.getElementById('mi2').textContent='OKS \uace0\uac1d \ud604\uc7ac '+stage+' \ub2e8\uacc4';
+let h='<table><thead><tr><th>#</th><th>\uace0\uac1d\uba85</th><th>MemberID</th><th>\uac00\uc785\uc77c</th><th>\ucd5c\uc885\ubc29\ubb38</th><th>\uc7a5\ubc14\uad6c\ub2c8</th><th>\uc720\uc785</th></tr></thead><tbody>';
+list.slice(0,200).forEach((r,i)=>h+='<tr><td>'+(i+1)+'</td><td style="font-weight:500">'+r.name+'</td><td style="font-size:10px">'+r.memberId+'</td><td>'+r.signupDate+'</td><td>'+r.visitDate+'</td><td>'+r.cartCount+'\uac74</td><td style="font-size:10px">'+r.lastUtm+'</td></tr>');
+h+='</tbody></table>';document.getElementById('ml2').innerHTML=h;document.getElementById('mo').classList.add('on');}
+function showCartList(type){const lists=window._cartLists||{};const list=lists[type]||[];const labels={all:'\ud65c\uc131 \uc7a5\ubc14\uad6c\ub2c8',conv:'\uc804\ud658',noconv:'\ubbf8\uc804\ud658'};document.getElementById('mt').textContent=labels[type]+' ('+list.length+'\uba85)';
+if(type==='conv'){document.getElementById('mi2').textContent='\uad6c\ub9e4+\uc7a5\ubc14\uad6c\ub2c8 \uc81c\ud488';let h='<table><thead><tr><th>#</th><th>\uba85</th><th>ID</th><th>\uad6c\ub9e4\uc81c\ud488</th><th>\uc7a5\ubc14\uad6c\ub2c8</th></tr></thead><tbody>';list.sort((a,b)=>b.cnt-a.cnt).slice(0,200).forEach((r,i)=>h+='<tr><td>'+(i+1)+'</td><td style="font-weight:500">'+r.name+'</td><td style="font-size:10px">'+r.id+'</td><td style="font-size:10px;max-width:200px;white-space:normal">'+(r.purchProds||'-')+'</td><td style="font-size:10px;max-width:200px;white-space:normal">'+r.prods+'</td></tr>');h+='</tbody></table>';document.getElementById('ml2').innerHTML=h;}
+else{document.getElementById('mi2').textContent='\uc7a5\ubc14\uad6c\ub2c8 \uc81c\ud488+\ub0a0\uc9dc';let h='<table><thead><tr><th>#</th><th>\uba85</th><th>ID</th><th>\uc81c\ud488</th><th>\ub0a0\uc9dc</th></tr></thead><tbody>';list.sort((a,b)=>(b.cd||'').localeCompare(a.cd||'')).slice(0,200).forEach((r,i)=>h+='<tr><td>'+(i+1)+'</td><td style="font-weight:500">'+r.name+'</td><td style="font-size:10px">'+r.id+'</td><td style="font-size:10px;max-width:250px;white-space:normal">'+r.prods+'</td><td>'+r.cd+'</td></tr>');h+='</tbody></table>';document.getElementById('ml2').innerHTML=h;}
+document.getElementById('mo').classList.add('on');}
+
+const SIG_ITEMS=["Studio Jacket","Razor Jacket","Sway Shirt","Matinee Shirt","Insert Knit","Overlay Longsleeve","Cruiser Jeans","Off Jeans","Sundown Shirt","Glint Shirt","Sunstripe Polo","Cruiser Tee","Deadstock Tee","Hustler Half Zip","Morrison Bermuda","Square Cut Tank","Shadow Tee"];
+function isSig(p){if(!p)return false;const u=String(p).toUpperCase();return SIG_ITEMS.some(s=>u.includes(s.toUpperCase()));}
+function mkCRM(crm){
+const wc=crm.filter(r=>+(r['profile.cartCount']||0)>0),hv=crm.filter(r=>+(r['web.sessionsCount']||0)>=3);
+const bo=crm.filter(r=>+(r['profile.cartCount']||0)>0&&+(r['web.sessionsCount']||0)>=3);
+const cartOnly=wc.filter(r=>+(r['web.sessionsCount']||0)<3);
+const visitOnly=hv.filter(r=>+(r['profile.cartCount']||0)<=0);
+const neither=crm.filter(r=>+(r['profile.cartCount']||0)<=0&&+(r['web.sessionsCount']||0)<3);
+document.getElementById('k2').innerHTML=kp('OKS \ud3ec\ucee4\uc2f1',fm(crm.length),'\uc2dc\uadf8\ub2c8\ucc98 \ubbf8\uad6c\ub9e4')+kp('\uc7a5\ubc14\uad6c\ub2c8+3\ud68c',fm(bo.length),pc(bo.length,crm.length),'var(--ac)')+kp('\uc7a5\ubc14\uad6c\ub2c8\ub9cc',fm(cartOnly.length),pc(cartOnly.length,crm.length),'var(--tl)')+kp('3+\ubc29\ubb38\ub9cc',fm(visitOnly.length),pc(visitOnly.length,crm.length),'var(--y)')+kp('\uae30\ud0c0',fm(neither.length),pc(neither.length,crm.length),'var(--t2)');
+// Signature funnel
+let sigP=0,anyP=0;
+crm.forEach(r=>{const mid=String(r.memberId||'').trim();const buyer=window._allBuyerMap?window._allBuyerMap[mid]:null;if(buyer&&buyer.orderNos.size>0){anyP++;if((buyer.prodNames||[]).some(p=>isSig(p)))sigP++;}});
+const nonSig=anyP-sigP,noP=crm.length-anyP;
+let fh='<div style="font-size:12px;font-weight:600;margin-bottom:8px">OKS \uad6c\ub9e4 \ud604\ud669</div>';
+fh+=mkbar('\uc804\uccb4 OKT',crm.length,crm.length,'var(--t2)')+mkbar('\uc2dc\uadf8\ub2c8\ucc98 \uad6c\ub9e4',sigP,crm.length,'var(--g)')+mkbar('\ube44\uc2dc\uadf8\ub2c8\ucc98',nonSig,crm.length,'var(--y)')+mkbar('\ubbf8\uad6c\ub9e4',noP,crm.length,'var(--r)');
+document.getElementById('okt-funnel').innerHTML=fh;
+// Priority targets
+window._cg={'\uc7a5\ubc14\uad6c\ub2c8+3\ud68c':bo,'\uc7a5\ubc14\uad6c\ub2c8\ub9cc':cartOnly,'3+\ubc29\ubb38\ub9cc':visitOnly,'\uae30\ud0c0':neither};
+const cls=['var(--ac)','var(--tl)','var(--y)','var(--t2)'];let h='';let i=0;
+for(const[l,list]of Object.entries(window._cg)){const w=Math.max(list.length/(crm.length||1)*100,5);h+='<div class="br" onclick="showG(\''+l+'\')"><div class="bl">'+l+'</div><div class="bt"><div class="bf" style="width:'+w+'%;background:'+cls[i%4]+';">'+pc(list.length,crm.length)+'</div></div><div class="bv">'+fm(list.length)+'\uba85</div></div>';i++;}
+document.getElementById('cs').innerHTML=h;
+// UTM + browser
+let uh='';
+[{title:'\ucd5c\ucd08 \uc720\uc785 \uc18c\uc2a4',f:'profile.utmSource'},{title:'\ucd5c\uadfc \uc720\uc785 \uc18c\uc2a4',f:'profile.lastUtmSource'},{title:'\ucd5c\ucd08 \ub9e4\uccb4',f:'profile.utmMedium'},{title:'\ucd5c\uadfc \ub9e4\uccb4',f:'profile.lastUtmMedium'},{title:'\ube0c\ub77c\uc6b0\uc800',f:'web.browserName'}].forEach(cfg=>{const mp={};crm.forEach(r=>{const v=r[cfg.f]||'(\uc5c6\uc74c)';mp[v]=(mp[v]||0)+1;});const ar=Object.entries(mp).sort((a,b)=>b[1]-a[1]).slice(0,8);const cls2=['var(--a2)','var(--b)','var(--g)','var(--tl)','var(--y)','var(--o)','var(--r)','var(--t2)'];uh+='<div><div style="font-size:12px;font-weight:600;margin-bottom:6px">'+cfg.title+'</div>';ar.forEach((s,j)=>uh+=mkbar(s[0],s[1],crm.length,cls2[j%8]));uh+='</div>';});
+document.getElementById('utm-grid').innerHTML=uh;
+try{saveWk({crCart:wc.length,crVisit:hv.length,cr30d:bo.length});}catch(e){}}
+function showG(l){const list=window._cg[l]||[];document.getElementById('mt').textContent=l+' ('+list.length+'\uba85)';document.getElementById('mi2').textContent='\ub9c8\uc9c0\ub9c9 \ubc29\ubb38\uc21c';const s=[...list].sort((a,b)=>{const da=a.lastSeenAt?String(a.lastSeenAt):'';const db=b.lastSeenAt?String(b.lastSeenAt):'';return db.localeCompare(da);});let h='<table><thead><tr><th>\uba85</th><th>MemberID</th><th>\ubc29\ubb38</th><th>\ub9c8\uc9c0\ub9c9</th><th>\uac00\uc785</th><th>\uc7a5\ubc14\uad6c\ub2c8</th><th>\uc720\uc785</th></tr></thead><tbody>';s.slice(0,200).forEach(r=>h+='<tr><td style="font-weight:500">'+(r.name||'-')+'</td><td style="font-size:10px">'+(r.memberId||'-')+'</td><td>'+(r['web.sessionsCount']||0)+'</td><td>'+dd(r.lastSeenAt)+'</td><td>'+dd(r.createdAt)+'</td><td>'+(r['profile.cartCount']||0)+'</td><td style="font-size:10px">'+(r['profile.lastUtmSource']||'-')+'</td></tr>');h+='</tbody></table>';document.getElementById('ml2').innerHTML=h;document.getElementById('mo').classList.add('on');}
+
+function mkSignup(cust,bm,cuId,cuDate,oCpn,orders,oI,oN){
+if(!cuId||!cuDate){document.getElementById('su1').innerHTML='<p style="color:var(--t2)">\ucee8\ub7fc \uc778\uc2dd \ubd88\uac00</p>';return;}
+const weeks={};cust.forEach(r=>{const d=pd(r[cuDate]);if(!d)return;const id=String(r[cuId]||'').trim();if(!id)return;const wk=getWk(d);if(!weeks[wk])weeks[wk]={total:0,purchased:0,notPurchased:0,coupons:{}};weeks[wk].total++;const buyer=bm[id];if(buyer&&buyer.orderNos.size>0){weeks[wk].purchased++;buyer.coupons.forEach(c=>{const cpnName=c&&String(c).trim()?String(c).trim():'\ucfe0\ud3f0 \ubbf8\uc0ac\uc6a9';weeks[wk].coupons[cpnName]=(weeks[wk].coupons[cpnName]||0)+1;});}else{weeks[wk].notPurchased++;}});
+const sorted=Object.entries(weeks).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,16);
+let h='<div style="overflow-x:auto"><table class="tb"><thead><tr><th>\uc8fc\ucc28(\uc6d4)</th><th>\uc2e0\uaddc\uac00\uc785</th><th>\uad6c\ub9e4</th><th>\ubbf8\uad6c\ub9e4</th><th>\uad6c\ub9e4\uc728</th></tr></thead><tbody>';
+sorted.forEach(([wk,d])=>{const cvr=d.total>0?(d.purchased/d.total*100).toFixed(1)+'%':'0%';const col=d.purchased/d.total>=0.4?'var(--g)':d.purchased/d.total>=0.2?'var(--y)':'var(--r)';h+='<tr><td style="font-weight:500">'+wk+'</td><td style="font-family:DM Sans">'+d.total+'</td><td style="font-family:DM Sans;color:var(--g)">'+d.purchased+'</td><td style="font-family:DM Sans;color:var(--r)">'+d.notPurchased+'</td><td style="color:'+col+'">'+cvr+'</td></tr>';});h+='</tbody></table></div>';
+
+document.getElementById('su1').innerHTML=h;}
+
+// CRM Send → Purchase Time Analysis
+function buildCrmTime(lms,sendlog,crm,fo,oI,oD,oN,oNm){
+try{
+const cvtPh=p=>{if(!p)return'';return String(p).replace(/-/g,'').replace(/^0/,'82');};
+// Build CRM phone→memberId map
+// Build order map by phone AND by ID
+const normPh=p=>{if(!p)return'';return String(p).replace(/-/g,'').replace(/\s/g,'');};
+const _oPh2=fc(fo[0])?fc(fo[0])('\uc8fc\ubb38\uc790 \ud734\ub300\uc804\ud654','\ud734\ub300\uc804\ud654','\uc8fc\ubb38\uc790\ud734\ub300\uc804\ud654','\ud578\ub4dc\ud3f0'):null;
+if(fo[0])console.log('Order ALL cols:',Object.keys(fo[0]));
+console.log('Order phone col:',_oPh2);
+// Order map by ID
+const orderMap={};
+fo.forEach(r=>{const id=oI?String(r[oI]||'').trim():null;const d=oD?pd(r[oD]):null;const no=oN?r[oN]:null;
+if(!id||!d||!no)return;if(!orderMap[id])orderMap[id]=[];
+if(!orderMap[id].some(o=>o.no===no))orderMap[id].push({date:d,no});});
+// Order map by phone (normalized)
+const orderByPhone={};
+if(_oPh2){fo.forEach(r=>{const ph=normPh(r[_oPh2]);const d=oD?pd(r[oD]):null;const no=oN?r[oN]:null;const nm=oNm?r[oNm]:'';const id=oI?String(r[oI]||'').trim():'';
+if(!ph||!d||!no)return;if(!orderByPhone[ph])orderByPhone[ph]={orders:[],name:nm,id};
+if(!orderByPhone[ph].orders.some(o=>o.no===no))orderByPhone[ph].orders.push({date:d,no});});}
+console.log('Order phone map:',Object.keys(orderByPhone).length,'phones');
+// Collect results
+const results=[];
+// LMS: directly match phone → order phone
+const lf=fc(lms[0]);const lmsPh=lf?lf('\uc804\ud654\ubc88\ud638','phone'):null;const lmsD=lf?lf('\ubc1c\uc1a1\uc77c\uc2dc'):null;
+console.log('LMS:',lms.length,'rows, phonecol:',lmsPh,'datecol:',lmsD);
+if(lms.length>0&&lms[0])console.log('LMS cols:',Object.keys(lms[0]));
+let lmsMatched=0,lmsOrdered=0;
+if(lmsPh&&lmsD){lms.forEach(r=>{
+const rawPh=normPh(r[lmsPh]);const sendD=pd(r[lmsD]);if(!rawPh||!sendD)return;
+// Match with order phone
+const entry=orderByPhone[rawPh];if(!entry){return;}
+lmsMatched++;
+const afterOrders=entry.orders.filter(o=>o.date>=sendD).sort((a,b)=>a.date-b.date);
+if(afterOrders.length>0){lmsOrdered++;
+const days=Math.floor((afterOrders[0].date-sendD)/864e5);
+const buyer=window._allBuyerMap?window._allBuyerMap[entry.id]:null;
+results.push({id:entry.id,name:entry.name||'',source:'LMS',sendDate:dd(sendD),purchDate:dd(afterOrders[0].date),days,orderCount:buyer?buyer.orderNos.size:0});}});}
+console.log('LMS result: matched=',lmsMatched,'ordered=',lmsOrdered);
+// SendLog sends
+const sf=fc(sendlog[0]);const slId=sf?sf('\ud68c\uc6d0 ID','\ud68c\uc6d0ID','memberId'):null;
+const slSendD=sf?sf('\ubc1c\uc1a1\uc77c\uc2dc','\uc804\uc1a1\uc77c\uc2dc','sendDate'):null;
+if(slId){sendlog.forEach(r=>{
+const mid=String(r[slId]||'').trim();if(!mid)return;
+const sendD=slSendD?pd(r[slSendD]):null;
+const orders=orderMap[mid];if(!orders)return;
+if(sendD){const afterOrders=orders.filter(o=>o.date>=sendD).sort((a,b)=>a.date-b.date);
+if(afterOrders.length>0){const days=Math.floor((afterOrders[0].date-sendD)/864e5);
+const buyer=window._allBuyerMap?window._allBuyerMap[mid]:null;
+results.push({id:mid,name:buyer?buyer.name:'',source:'SendLog',sendDate:dd(sendD),purchDate:dd(afterOrders[0].date),days,orderCount:buyer?buyer.orderNos.size:0});}}
+else{// No send date - check if purchased at all
+const buyer=window._allBuyerMap?window._allBuyerMap[mid]:null;
+if(buyer&&buyer.orderNos.size>0)results.push({id:mid,name:buyer.name||'',source:'SendLog',sendDate:'-',purchDate:dd(buyer.orderDates[0]?buyer.orderDates[0].date:null),days:-1,orderCount:buyer.orderNos.size});}});}
+// Render for 26SS RFM
+const valid=results.filter(r=>r.days>=0);
+if(valid.length>0){
+const avgDays=Math.round(valid.reduce((s,r)=>s+r.days,0)/valid.length);
+const medDays=med(valid.map(r=>r.days));
+// Day distribution
+const dayBuckets={'당일(0일)':0,'1~3일':0,'4~7일':0,'8~14일':0,'15~30일':0,'31일+':0};
+valid.forEach(r=>{if(r.days===0)dayBuckets['당일(0일)']++;else if(r.days<=3)dayBuckets['1~3일']++;else if(r.days<=7)dayBuckets['4~7일']++;else if(r.days<=14)dayBuckets['8~14일']++;else if(r.days<=30)dayBuckets['15~30일']++;else dayBuckets['31일+']++;});
+let sh='<div class="kr">'+kp('\ubc1c\uc1a1\ud6c4 \uad6c\ub9e4',fm(valid.length))+kp('\ud3c9\uade0 \uc18c\uc694\uc77c',avgDays+'\uc77c')+kp('\uc911\uac04\uac12',medDays+'\uc77c')+'</div>';
+const cls4=['var(--g)','var(--ac)','var(--b)','var(--y)','var(--o)','var(--r)'];let bi=0;
+for(const[label,cnt]of Object.entries(dayBuckets)){if(cnt>0)sh+=mkbar(label,cnt,valid.length,cls4[bi%6]);bi++;}
+window._crmTimeData=valid;
+sh+='<div style="margin-top:12px;font-size:12px;font-weight:600">\uace0\uac1d \ub9ac\uc2a4\ud2b8</div>';
+sh+='<div style="display:flex;gap:8px;margin:8px 0;flex-wrap:wrap">';
+sh+='<select id="crm-f-src" onchange="filterCrmTime()" style="background:var(--c2);color:var(--t1);border:1px solid var(--bd);border-radius:4px;padding:4px 8px;font-size:11px"><option value="">\ucc44\ub110 \uc804\uccb4</option><option value="LMS">LMS</option><option value="SendLog">SendLog</option></select>';
+sh+='<select id="crm-f-days" onchange="filterCrmTime()" style="background:var(--c2);color:var(--t1);border:1px solid var(--bd);border-radius:4px;padding:4px 8px;font-size:11px"><option value="">\uc18c\uc694\uc77c \uc804\uccb4</option><option value="0">\ub2f9\uc77c(0\uc77c)</option><option value="3">1~3\uc77c</option><option value="7">4~7\uc77c</option><option value="14">8~14\uc77c</option><option value="30">15~30\uc77c</option><option value="99">31\uc77c+</option></select>';
+sh+='<select id="crm-f-ord" onchange="filterCrmTime()" style="background:var(--c2);color:var(--t1);border:1px solid var(--bd);border-radius:4px;padding:4px 8px;font-size:11px"><option value="">\ucd1d\uc8fc\ubb38 \uc804\uccb4</option><option value="1">1\ud68c</option><option value="2">2\ud68c+</option><option value="3">3\ud68c+</option></select>';
+sh+='</div>';
+sh+='<div class="tw" style="max-height:300px" id="crm-time-tbl"></div>';
+document.getElementById('ss-crm-time').innerHTML=sh;try{filterCrmTime();}catch(e){}}
+else{document.getElementById('ss-crm-time').innerHTML='<p style="color:var(--t2)">\ubc1c\uc1a1 \ud6c4 \uad6c\ub9e4 \ub370\uc774\ud130 \uc5c6\uc74c</p>';}
+// Render for 재구매 단골 (2+ orders only)
+const rpResults=valid.filter(r=>r.orderCount>=2);
+if(rpResults.length>0){
+const avgD2=Math.round(rpResults.reduce((s,r)=>s+r.days,0)/rpResults.length);
+let rh='<div class="kr">'+kp('CRM\u2192\uc7ac\uad6c\ub9e4',fm(rpResults.length))+kp('\ud3c9\uade0',avgD2+'\uc77c')+'</div>';
+rh+='<div class="tw" style="max-height:200px"><table class="tb"><thead><tr><th>\uba85</th><th>ID</th><th>\ucc44\ub110</th><th>\ubc1c\uc1a1\uc77c</th><th>\uad6c\ub9e4\uc77c</th><th>\uc18c\uc694\uc77c</th><th>\ucd1d\uc8fc\ubb38</th></tr></thead><tbody>';
+rpResults.sort((a,b)=>a.days-b.days).forEach(r=>rh+='<tr><td style="font-weight:500">'+r.name+'</td><td style="font-size:10px">'+r.id+'</td><td>'+r.source+'</td><td>'+r.sendDate+'</td><td>'+r.purchDate+'</td><td style="font-family:DM Sans;color:var(--ac)">'+r.days+'\uc77c</td><td>'+r.orderCount+'\ud68c</td></tr>');
+rh+='</tbody></table></div>';
+document.getElementById('rp-crm-time').innerHTML=rh;}
+else{document.getElementById('rp-crm-time').innerHTML='<p style="color:var(--t2)">CRM \ubc1c\uc1a1 \uc7ac\uad6c\ub9e4 \uace0\uac1d \uc5c6\uc74c</p>';}
+}catch(e){console.error('CRM time:',e);
+try{document.getElementById('ss-crm-time').innerHTML='<p style="color:var(--t2)">'+e.message+'</p>';}catch(e2){}
+try{document.getElementById('rp-crm-time').innerHTML='<p style="color:var(--t2)">'+e.message+'</p>';}catch(e3){}}}
+
+// Show repeat customer detail for coupon/points click
+function showRpDetail(type,label){
+var list;
+if(type==='cpn'){list=window._rpCpnMap?window._rpCpnMap[label]:null;}
+else{list=window._rpPtsMap2?window._rpPtsMap2[label]:null;}
+if(!list||!list.length)return;
+document.getElementById('mt').textContent=label+' ('+list.length+'\uac74)';
+if(type==='cpn'){
+document.getElementById('mi2').textContent='\ucfe0\ud3f0: '+label;
+var h='<table><thead><tr><th>#</th><th>\uace0\uac1d\uba85</th><th>ID</th><th>\uc8fc\ubb38\uc77c</th><th>\uc218\ub7c9</th><th>\uc801\ub9bd\uae08</th><th>\uac00\uc785\uc77c</th></tr></thead><tbody>';
+list.slice(0,200).forEach(function(r,i){h+='<tr><td>'+(i+1)+'</td><td style="font-weight:500">'+r.name+'</td><td style="font-size:10px">'+r.id+'</td><td>'+r.orderDate+'</td><td>'+r.qty+'</td><td style="font-family:DM Sans">'+fw(r.pts)+'</td><td>'+r.signup+'</td></tr>';});
+}else{
+document.getElementById('mi2').textContent='\uc801\ub9bd\uae08: '+label;
+var h='<table><thead><tr><th>#</th><th>\uace0\uac1d\uba85</th><th>ID</th><th>\uc8fc\ubb38\uc77c</th><th>\uc218\ub7c9</th><th>\uc801\ub9bd\uae08</th><th>\ucfe0\ud3f0\uba85</th><th>\uac00\uc785\uc77c</th></tr></thead><tbody>';
+list.slice(0,200).forEach(function(r,i){h+='<tr><td>'+(i+1)+'</td><td style="font-weight:500">'+r.name+'</td><td style="font-size:10px">'+r.id+'</td><td>'+r.orderDate+'</td><td>'+r.qty+'</td><td style="font-family:DM Sans">'+fw(r.pts)+'</td><td style="font-size:10px">'+r.cpn+'</td><td>'+r.signup+'</td></tr>';});}
+h+='</tbody></table>';
+document.getElementById('ml2').innerHTML=h;
+document.getElementById('mo').classList.add('on');}
+
+function searchSS(){
+const q=document.getElementById('ss-search').value.trim().toLowerCase();
+if(!q){document.getElementById('ss-search-result').textContent='검색어를 입력하세요';return;}
+const segs=window._ssSegs;if(!segs){document.getElementById('ss-search-result').textContent='세그먼트 데이터 없음';return;}
+for(const[name,seg]of Object.entries(segs)){
+if(!seg||!seg.list)continue;
+const found=seg.list.find(x=>x.id.toLowerCase().includes(q)||x.name.toLowerCase().includes(q));
+if(found){
+document.getElementById('ss-search-result').innerHTML='<span style="color:var(--ac)">\u2714 '+found.name+' ('+found.id+') \u2192 <b>'+name+'</b> | M:'+fw(found.m)+' F:'+found.f+'\ud68c R:'+found.r+'\uc77c</span>';
+showSS(name);
+return;}}
+document.getElementById('ss-search-result').innerHTML='<span style="color:var(--r)">\u2718 "'+q+'" \uac80\uc0c9 \uacb0\uacfc \uc5c6\uc74c (30K \ubbf8\ub9cc \ub610\ub294 26SS \uc774\uc804 \uad6c\ub9e4)</span>';}
+
+function filterCrmTime(){
+const data=window._crmTimeData||[];
+const src=document.getElementById('crm-f-src').value;
+const days=document.getElementById('crm-f-days').value;
+const ord=document.getElementById('crm-f-ord').value;
+let f=data;
+if(src)f=f.filter(r=>r.source===src);
+if(days==='0')f=f.filter(r=>r.days===0);
+else if(days==='3')f=f.filter(r=>r.days>=1&&r.days<=3);
+else if(days==='7')f=f.filter(r=>r.days>=4&&r.days<=7);
+else if(days==='14')f=f.filter(r=>r.days>=8&&r.days<=14);
+else if(days==='30')f=f.filter(r=>r.days>=15&&r.days<=30);
+else if(days==='99')f=f.filter(r=>r.days>=31);
+if(ord==='1')f=f.filter(r=>r.orderCount===1);
+else if(ord==='2')f=f.filter(r=>r.orderCount>=2);
+else if(ord==='3')f=f.filter(r=>r.orderCount>=3);
+f.sort((a,b)=>a.days-b.days);
+let h='<div style="font-size:10px;color:var(--t2);margin-bottom:4px">'+fm(f.length)+'\uac74</div><table class="tb"><thead><tr><th>\uba85</th><th>ID</th><th>\ucc44\ub110</th><th>\ubc1c\uc1a1\uc77c</th><th>\uad6c\ub9e4\uc77c</th><th>\uc18c\uc694\uc77c</th><th>\ucd1d\uc8fc\ubb38</th></tr></thead><tbody>';
+f.slice(0,100).forEach(r=>h+='<tr><td style="font-weight:500">'+r.name+'</td><td style="font-size:10px">'+r.id+'</td><td>'+r.source+'</td><td>'+r.sendDate+'</td><td>'+r.purchDate+'</td><td style="font-family:DM Sans;color:var(--ac)">'+r.days+'\uc77c</td><td>'+r.orderCount+'\ud68c</td></tr>');
+h+='</tbody></table>';document.getElementById('crm-time-tbl').innerHTML=h;}
+
+function saveWk(data){try{const key=getWk();const ex=JSON.parse(localStorage.getItem('mmic_weekly')||'{}');ex[key]={...(ex[key]||{}),...data,ts:new Date().toISOString()};const ks=Object.keys(ex).sort();while(ks.length>52)delete ex[ks.shift()];localStorage.setItem('mmic_weekly',JSON.stringify(ex));}catch(e){}}
+function renderWk(){try{
+const data=JSON.parse(localStorage.getItem('mmic_weekly')||'{}');
+const wks=Object.entries(data).sort((a,b)=>b[0].localeCompare(a[0]));
+if(!wks.length)return;
+const curWk=getWk();
+function wkTable(cid,cols){
+const el=document.getElementById(cid);if(!el)return;
+let h='<div style="font-size:11px;color:var(--t2);margin-bottom:6px">\uc774\ubc88 \uc8fc: '+curWk+'~ | \ub370\uc774\ud130 \ub355\uc5b4\uc50c\uc6cc\ub3c4 \uc8fc\ucc28\ubcc4 KPI \uc790\ub3d9 \ubcf4\uc874</div>';
+h+='<div style="overflow-x:auto"><table class="tb"><thead><tr><th>\uc8fc\ucc28</th>';
+cols.forEach(c2=>h+='<th>'+c2.label+'</th>');
+h+='</tr></thead><tbody>';
+const seen=new Set();
+wks.filter(([wk])=>{if(seen.has(wk))return false;seen.add(wk);return true;}).slice(0,12).forEach(([wk,d],i)=>{
+const p=wks[i+1]?wks[i+1][1]:null;
+const isCur=wk===curWk;
+h+='<tr'+(isCur?' style="background:rgba(163,130,255,0.08)"':'')+'><td style="font-weight:500">'+wk+(isCur?' \u25c0':'')+'</td>';
+cols.forEach(c2=>{
+const v=d[c2.key]!=null?d[c2.key]:'-';
+let df='';
+if(p&&p[c2.key]!=null){const dv=(d[c2.key]||0)-(p[c2.key]||0);
+if(dv>0)df=' <span style="color:var(--g);font-size:9px">\u25b2'+dv+'</span>';
+else if(dv<0)df=' <span style="color:var(--r);font-size:9px">\u25bc'+Math.abs(dv)+'</span>';}
+h+='<td style="font-family:DM Sans">'+(typeof v==='number'?fm(v):v)+df+'</td>';
+});h+='</tr>';});
+h+='</tbody></table></div>';el.innerHTML=h;}
+wkTable('wk-ov',[{key:'nCu',label:'\uc804\uccb4'},{key:'nB',label:'\uad6c\ub9e4'},{key:'nR',label:'\uc7ac\uad6c\ub9e4'},{key:'nL',label:'\ucda9\uc131'}]);
+wkTable('wk-rt',[{key:'nB',label:'\uad6c\ub9e4\uace0\uac1d'},{key:'nR',label:'\uc7ac\uad6c\ub9e4'}]);
+wkTable('wk-rf',[{key:'rfElite',label:'Elite'},{key:'rfTopVIP',label:'TopVIP'},{key:'rfVIP',label:'VIP'},{key:'rfHigh',label:'High'},{key:'rfMid',label:'Mid'},{key:'rfLow',label:'Low'}]);
+wkTable('wk-ss',[{key:'ssElite',label:'Elite'},{key:'ssHigh',label:'High'},{key:'ssMid',label:'Mid'},{key:'ssLow',label:'Low'}]);
+wkTable('wk-rp',[{key:'rpTotal',label:'\uc7ac\uad6c\ub9e4'}]);
+wkTable('wk-ca',[{key:'caConv',label:'\uc804\ud658'},{key:'caNoconv',label:'\ubbf8\uc804\ud658'}]);
+wkTable('wk-cr',[{key:'nCr',label:'CRM'},{key:'crCart',label:'\uc7a5\ubc14\uad6c\ub2c8\u6709'},{key:'crVisit',label:'3+\ubc29\ubb38'}]);
+}catch(e){console.log('Wk:',e);}}
+
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',function(){document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.pg').forEach(x=>x.classList.remove('active'));this.classList.add('active');document.getElementById('pg-'+this.dataset.p).classList.add('active');}));
+init();
+</script>
+</body>
+</html>
